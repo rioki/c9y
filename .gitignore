@@ -1,0 +1,6 @@
+
+*.bmarks
+*.depend
+*.layout
+/bin
+/obj

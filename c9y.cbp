@@ -15,11 +15,12 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
-					<Add option="-DBUILD_DLL" />
 					<Add option="-g" />
+					<Add option="-DBUILD_DLL" />
+					<Add directory="include\c9y" />
 				</Compiler>
 				<Linker>
-					<Add library="user32" />
+					<Add library="sigc++" />
 				</Linker>
 			</Target>
 			<Target title="c9y (Release)">
@@ -30,13 +31,14 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-DBUILD_DLL" />
-					<Add option="-O2" />
+					<Add directory="include\c9y" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="user32" />
+					<Add library="sigc++" />
 				</Linker>
 			</Target>
 			<Target title="c9y_unit_test (Debug)">
@@ -44,31 +46,45 @@
 				<Option object_output="obj\Debug\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-Wall" />
-					<Add option="-DBUILD_DLL" />
 					<Add option="-g" />
+					<Add option="-DBUILD_DLL" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
-					<Add library="user32" />
+					<Add library="c9y" />
+					<Add library="sigc++" />
+					<Add library="UnitTest++" />
+					<Add directory="bin\Debug" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="test\c9y_unit_test.bat $(TARGET_OUTPUT_DIR) $(#sigc)" />
+					<Mode after="always" />
+				</ExtraCommands>
 			</Target>
 			<Target title="c9y_unit_test (Release)">
 				<Option output="bin\Release\c9y_unit_test" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
 				<Compiler>
+					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-DBUILD_DLL" />
-					<Add option="-O2" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="user32" />
+					<Add library="c9y" />
+					<Add library="sigc++" />
+					<Add library="UnitTest++" />
+					<Add directory="bin\Release" />
 				</Linker>
+				<ExtraCommands>
+					<Add after="test\c9y_unit_test.bat $(TARGET_OUTPUT_DIR) $(#sigc)" />
+					<Mode after="always" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<VirtualTargets>
@@ -76,14 +92,52 @@
 			<Add alias="Release" targets="c9y (Release);c9y_unit_test (Release);" />
 		</VirtualTargets>
 		<Compiler>
+			<Add directory="$(#sigc.include)" />
 			<Add directory="$(#unittest.include)" />
 		</Compiler>
 		<Linker>
+			<Add directory="$(#sigc.lib)" />
 			<Add directory="$(#unittest.lib)" />
 		</Linker>
-		<Unit filename="include\c9y\defines.h">
+		<Unit filename="include\c9y\Condition.h">
 			<Option target="c9y (Debug)" />
 			<Option target="c9y (Release)" />
+		</Unit>
+		<Unit filename="include\c9y\Lock.h">
+			<Option target="c9y (Debug)" />
+			<Option target="c9y (Release)" />
+		</Unit>
+		<Unit filename="include\c9y\Mutex.h">
+			<Option target="c9y (Debug)" />
+			<Option target="c9y (Release)" />
+		</Unit>
+		<Unit filename="include\c9y\Thread.h">
+			<Option target="c9y (Debug)" />
+			<Option target="c9y (Release)" />
+		</Unit>
+		<Unit filename="src\win32\Condition.cpp">
+			<Option target="c9y (Debug)" />
+			<Option target="c9y (Release)" />
+		</Unit>
+		<Unit filename="src\win32\Mutex.cpp">
+			<Option target="c9y (Debug)" />
+			<Option target="c9y (Release)" />
+		</Unit>
+		<Unit filename="src\win32\Thread.cpp">
+			<Option target="c9y (Debug)" />
+			<Option target="c9y (Release)" />
+		</Unit>
+		<Unit filename="test\ConditionTest.cpp">
+			<Option target="c9y_unit_test (Debug)" />
+			<Option target="c9y_unit_test (Release)" />
+		</Unit>
+		<Unit filename="test\MutexTest.cpp">
+			<Option target="c9y_unit_test (Debug)" />
+			<Option target="c9y_unit_test (Release)" />
+		</Unit>
+		<Unit filename="test\ThreadTest.cpp">
+			<Option target="c9y_unit_test (Debug)" />
+			<Option target="c9y_unit_test (Release)" />
 		</Unit>
 		<Unit filename="test\c9y_unit_test.cpp">
 			<Option target="c9y_unit_test (Debug)" />

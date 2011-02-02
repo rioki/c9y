@@ -20,7 +20,10 @@ namespace c9y
 //------------------------------------------------------------------------------
     Thread::~Thread()
     {
-        kill();
+        if (handle != NULL)
+        {
+            kill();
+        }
     }
 
 //------------------------------------------------------------------------------
@@ -40,15 +43,30 @@ namespace c9y
 //------------------------------------------------------------------------------
     void Thread::join()
     {
-        WaitForSingleObject(handle, INFINITE);
+        if (handle == NULL)
+        {
+            throw std::logic_error("Trying to join unstarted thread.");
+        }
+
+        DWORD result = WaitForSingleObject(handle, INFINITE);
         CloseHandle(handle);
         handle = NULL;
         pid = 0;
+
+        if (result != WAIT_OBJECT_0)
+        {
+            throw std::runtime_error("Failed to join thread.");
+        }
     }
 
 //------------------------------------------------------------------------------
     void Thread::kill()
     {
+        if (handle == NULL)
+        {
+            throw std::logic_error("Trying to kill unstarted thread.");
+        }
+
         TerminateThread(handle, 2);
         CloseHandle(handle);
         handle = NULL;

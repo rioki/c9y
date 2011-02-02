@@ -73,4 +73,18 @@ SUITE(ThreadTest)
         thread.start();
         sleep(1);
     }
+
+//------------------------------------------------------------------------------
+    TEST(join_unstarted_thread_throws)
+    {
+        c9y::Thread thread(sigc::ptr_fun(&dummy_func));
+        CHECK_THROW(thread.join(), std::logic_error);
+    }
+
+//------------------------------------------------------------------------------
+    TEST(kill_unstarted_thread_throws)
+    {
+        c9y::Thread thread(sigc::ptr_fun(&dummy_func));
+        CHECK_THROW(thread.kill(), std::logic_error);
+    }
 }

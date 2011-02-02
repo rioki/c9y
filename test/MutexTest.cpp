@@ -1,5 +1,6 @@
 
 #include <c9y/Mutex.h>
+#include <c9y/Lock.h>
 #include <c9y/Thread.h>
 
 #include <UnitTest++/UnitTest++.h>
@@ -57,12 +58,11 @@ SUITE(MutexTest)
 
         void operator () ()
         {
-            account.lock();
+            c9y::Lock<Account> lock(account);
             unsigned int total = account.get_total();
             sleep(100);
             total += 200;
             account.set_total(total);
-            account.unlock();
         }
 
     private:

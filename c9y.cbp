@@ -86,10 +86,47 @@
 					<Mode after="always" />
 				</ExtraCommands>
 			</Target>
+			<Target title="c9y_consumer_producer (Debug)">
+				<Option output="bin\Debug\c9y_consumer_producer" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-DBUILD_DLL" />
+					<Add directory="include" />
+				</Compiler>
+				<Linker>
+					<Add library="c9y" />
+					<Add library="sigc++" />
+					<Add library="UnitTest++" />
+					<Add directory="bin\Debug" />
+				</Linker>
+			</Target>
+			<Target title="c9y_consumer_producer (Release)">
+				<Option output="bin\Release\c9y_consumer_producer" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DBUILD_DLL" />
+					<Add directory="include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="c9y" />
+					<Add library="sigc++" />
+					<Add library="UnitTest++" />
+					<Add directory="bin\Release" />
+				</Linker>
+			</Target>
 		</Build>
 		<VirtualTargets>
-			<Add alias="Debug" targets="c9y (Debug);c9y_unit_test (Debug);" />
-			<Add alias="Release" targets="c9y (Release);c9y_unit_test (Release);" />
+			<Add alias="Debug" targets="c9y (Debug);c9y_unit_test (Debug);c9y_consumer_producer (Debug);" />
+			<Add alias="Release" targets="c9y (Release);c9y_unit_test (Release);c9y_consumer_producer (Release);" />
 		</VirtualTargets>
 		<Compiler>
 			<Add directory="$(#sigc.include)" />
@@ -99,6 +136,34 @@
 			<Add directory="$(#sigc.lib)" />
 			<Add directory="$(#unittest.lib)" />
 		</Linker>
+		<Unit filename="examples\consumer_producer\Consumer.cpp">
+			<Option target="c9y_consumer_producer (Debug)" />
+			<Option target="c9y_consumer_producer (Release)" />
+		</Unit>
+		<Unit filename="examples\consumer_producer\Consumer.h">
+			<Option target="c9y_consumer_producer (Debug)" />
+			<Option target="c9y_consumer_producer (Release)" />
+		</Unit>
+		<Unit filename="examples\consumer_producer\Producer.cpp">
+			<Option target="c9y_consumer_producer (Debug)" />
+			<Option target="c9y_consumer_producer (Release)" />
+		</Unit>
+		<Unit filename="examples\consumer_producer\Producer.h">
+			<Option target="c9y_consumer_producer (Debug)" />
+			<Option target="c9y_consumer_producer (Release)" />
+		</Unit>
+		<Unit filename="examples\consumer_producer\Queue.cpp">
+			<Option target="c9y_consumer_producer (Debug)" />
+			<Option target="c9y_consumer_producer (Release)" />
+		</Unit>
+		<Unit filename="examples\consumer_producer\Queue.h">
+			<Option target="c9y_consumer_producer (Debug)" />
+			<Option target="c9y_consumer_producer (Release)" />
+		</Unit>
+		<Unit filename="examples\consumer_producer\main.cpp">
+			<Option target="c9y_consumer_producer (Debug)" />
+			<Option target="c9y_consumer_producer (Release)" />
+		</Unit>
 		<Unit filename="include\c9y\Condition.h">
 			<Option target="c9y (Debug)" />
 			<Option target="c9y (Release)" />
@@ -115,6 +180,10 @@
 			<Option target="c9y (Debug)" />
 			<Option target="c9y (Release)" />
 		</Unit>
+		<Unit filename="include\c9y\utility.h">
+			<Option target="c9y (Debug)" />
+			<Option target="c9y (Release)" />
+		</Unit>
 		<Unit filename="src\win32\Condition.cpp">
 			<Option target="c9y (Debug)" />
 			<Option target="c9y (Release)" />
@@ -124,6 +193,10 @@
 			<Option target="c9y (Release)" />
 		</Unit>
 		<Unit filename="src\win32\Thread.cpp">
+			<Option target="c9y (Debug)" />
+			<Option target="c9y (Release)" />
+		</Unit>
+		<Unit filename="src\win32\utility.cpp">
 			<Option target="c9y (Debug)" />
 			<Option target="c9y (Release)" />
 		</Unit>

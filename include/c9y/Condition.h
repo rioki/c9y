@@ -19,10 +19,11 @@ namespace c9y
 
         void signal();
 
+        void clear();
+
     private:
         #ifdef _WIN32
         HANDLE handle;
-        unsigned int thread_count;
         #endif
 
         Condition(const Condition&);

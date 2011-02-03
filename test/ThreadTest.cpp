@@ -1,5 +1,6 @@
 
 #include <c9y/Thread.h>
+#include <c9y/utility.h>
 
 #include <stdexcept>
 #include <UnitTest++/UnitTest++.h>
@@ -32,14 +33,6 @@ SUITE(ThreadTest)
     }
 
 //------------------------------------------------------------------------------
-#ifdef _WIN32
-    void sleep(unsigned int ms)
-    {
-        Sleep(ms);
-    }
-#endif
-
-//------------------------------------------------------------------------------
     TEST(executes)
     {
         ExecTest exec_test;
@@ -62,7 +55,7 @@ SUITE(ThreadTest)
     {
         c9y::Thread thread(sigc::ptr_fun(&loop_inifinite));
         thread.start();
-        sleep(1);
+        c9y::sleep(1);
         thread.kill();
     }
 
@@ -71,7 +64,7 @@ SUITE(ThreadTest)
     {
         c9y::Thread thread(sigc::ptr_fun(&loop_inifinite));
         thread.start();
-        sleep(1);
+        c9y::sleep(1);
     }
 
 //------------------------------------------------------------------------------

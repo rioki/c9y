@@ -1,20 +1,13 @@
 
 #include <c9y/Condition.h>
 #include <c9y/Thread.h>
+#include <c9y/utility.h>
 
 #include <cassert>
 #include <UnitTest++/UnitTest++.h>
 
 SUITE(ConditionTest)
 {
-//------------------------------------------------------------------------------
-#ifdef _WIN32
-    void sleep(unsigned int ms)
-    {
-        Sleep(ms);
-    }
-#endif
-
 //------------------------------------------------------------------------------
     class Countdown
     {
@@ -58,7 +51,7 @@ SUITE(ConditionTest)
             while (countdown.get_value() != 0)
             {
                 countdown.tick();
-                sleep(10);
+                c9y::sleep(10);
             }
         }
 

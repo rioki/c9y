@@ -1,8 +1,29 @@
 
   c9y - concurrency
 
-About
+1. About
 
 The c9y library is a small library aimed to provide basic and not so basic 
 constructs for parallel, concurrent and asynchronous algorithms.
 
+2. Copying
+
+c9y is released under the Lesser GNU Public License. 
+See COPYING.txt for details.
+
+3. Extending c9y
+
+Bugs, features, comments, help and sugestions:
+Contact c9y@rioki.org
+
+Up to date source code can be found at http://www.github.com/rioki/c9y.
+
+4. Changes
+
+0.1 (2011-02-08)
+  
+Basic threading and synchronization components:
+  * Thread
+  * Mutex
+  * Condition
+  * Lock

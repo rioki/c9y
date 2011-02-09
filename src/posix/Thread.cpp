@@ -21,6 +21,7 @@
 #include "Thread.h"
 
 #include <stdexcept>
+#include <iostream>
 
 namespace c9y
 {
@@ -33,8 +34,14 @@ namespace c9y
         pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &dummy);
         
         Thread* thread = reinterpret_cast<Thread*>(data);
-        thread->slot();
-        
+        try
+        {
+            thread->slot();
+        }
+        catch (const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+        }
         return NULL;
     }
 

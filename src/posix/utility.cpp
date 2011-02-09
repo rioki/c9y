@@ -26,7 +26,7 @@ namespace c9y
 {
     void sleep(unsigned int ms)
     {
-        usleep(ms);
+        usleep(ms * 1000);
     }
 }
 

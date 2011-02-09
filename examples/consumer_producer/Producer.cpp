@@ -20,6 +20,7 @@
 
 #include "Producer.h"
 
+#include <cstdlib>
 #include <c9y/utility.h>
 
 #include "Queue.h"

@@ -50,7 +50,7 @@ namespace c9y
         int ret = pthread_mutex_lock(&handle);
         if (ret != 0)
         {
-            throw std::runtime_error("Failed to lock error.");
+            throw std::runtime_error("Failed to lock mutex.");
         }
     }
 
@@ -60,7 +60,7 @@ namespace c9y
         int ret = pthread_mutex_unlock(&handle);
         if (ret != 0)
         {
-            throw std::runtime_error("Failed to unlock error.");
+            throw std::runtime_error("Failed to unlock mutex.");
         }
     }
 }

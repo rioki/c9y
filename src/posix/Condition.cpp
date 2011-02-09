@@ -44,6 +44,9 @@ namespace c9y
 //------------------------------------------------------------------------------
     Condition::~Condition()
     {
+        // We need to broadcast, to wake up any waiting threads.
+        pthread_cond_broadcast(&cond);
+        
         pthread_mutex_destroy(&mutex);
         pthread_cond_destroy(&cond);
     }

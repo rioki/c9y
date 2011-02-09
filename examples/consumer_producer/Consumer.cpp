@@ -21,6 +21,7 @@
 #include "Consumer.h"
 
 #include <iostream>
+#include <cstdlib>
 #include <c9y/utility.h>
 
 #include "Queue.h"

@@ -38,8 +38,8 @@ int main()
     producer.start();
     consumer.start();
 
-    // run one minute
-    c9y::sleep(60000);
+    // run 10 s
+    c9y::sleep(10000);
 
     producer.finish();
     consumer.finish();

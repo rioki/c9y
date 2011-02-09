@@ -21,8 +21,14 @@
 #ifndef _C9Y_CONDITION_H_
 #define _C9Y_CONDITION_H_
 
+#include "config.h"
+
 #ifdef _WIN32
 #include <windows.h>
+#endif
+
+#ifdef _POSIX
+#include <pthread.h>
 #endif
 
 namespace c9y
@@ -78,6 +84,12 @@ namespace c9y
     private:
         #ifdef _WIN32
         HANDLE handle;
+        #endif
+        
+        #ifdef _POSIX
+        bool signaled;
+        pthread_mutex_t mutex;
+        pthread_cond_t cond;
         #endif
 
         Condition(const Condition&);

@@ -21,10 +21,16 @@
 #ifndef _C9Y_THREADS_H_
 #define _C9Y_THREADS_H_
 
+#include "config.h"
+
 #include <sigc++/slot.h>
 
 #ifdef _WIN32
 #include <windows.h>
+#endif
+
+#ifdef _POSIX
+#include <pthread.h>
 #endif
 
 namespace c9y
@@ -81,10 +87,22 @@ namespace c9y
 
     private:
         sigc::slot<void> slot;
+        
         #ifdef _WIN32
         HANDLE handle;
         DWORD pid;
         friend DWORD WINAPI threadproc(LPVOID lpParameter);
+        #endif
+        
+        #ifdef _POSIX
+        // NOTE: There is no way to check if the pthread_t value is valid or not.
+        // That is there is no defined invalid value. To aliviate this we use this
+        // boolean, not let's all pray that this works as expected. 
+        // -> i.e. no race conditions 
+        bool valid;
+        pthread_t thread;
+        
+        friend void* threadproc(void* data); 
         #endif
 
         Thread(const Thread&);

@@ -18,26 +18,15 @@
 // along with c9y. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _C9Y_UTILITY_H_
-#define _C9Y_UTILITY_H_
+#include "utility.h"
 
-#include "config.h"
+#include <unistd.h>
 
 namespace c9y
 {
-    /**
-     * Suspend Execution for a Defined Duration
-     *
-     * This function will supend the execution of the current thread for a
-     * specified duration.
-     *
-     * @param ms the ducration in milliseconds
-     *
-     * @note Depending on your operating system and environment the granularity
-     * can be up 10 ms.
-     **/
-    void sleep(unsigned int ms);
+    void sleep(unsigned int ms)
+    {
+        usleep(ms);
+    }
 }
-
-#endif
 

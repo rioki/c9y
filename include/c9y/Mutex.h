@@ -21,8 +21,14 @@
 #ifndef _C9Y_MUTEX_H_
 #define _C9Y_MUTEX_H_
 
+#include "config.h"
+
 #ifdef _WIN32
 #include <windows.h>
+#endif
+
+#ifdef _POSIX
+#include <pthread.h>
 #endif
 
 namespace c9y
@@ -65,6 +71,10 @@ namespace c9y
         #ifdef _WIN32
         HANDLE handle;
         #endif
+        
+        #ifdef _POSIX
+        pthread_mutex_t handle;
+        #endif
 
         Mutex(const Mutex&);
         const Mutex& operator = (const Mutex&);
@@ -72,3 +82,4 @@ namespace c9y
 }
 
 #endif
+

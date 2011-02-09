@@ -22,6 +22,8 @@
 #ifndef _C9Y_LOCK_H_
 #define _C9Y_LOCK_H_
 
+#include "config.h"
+
 namespace c9y
 {
     /**

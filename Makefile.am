@@ -1,7 +1,7 @@
 
 pkginclude_HEADERS          = include/c9y/Condition.h include/c9y/Lock.h  \
                               include/c9y/Mutex.h include/c9y/Thread.h  \
-                              include/c9y/utility.h
+                              include/c9y/utility.h include/c9y/config.h
 
 lib_LTLIBRARIES             = libc9y.la
 
@@ -34,4 +34,6 @@ consumer_producer_SOURCES   = examples/consumer_producer/Consumer.cpp \
                               examples/consumer_producer/Producer.cpp \
                               examples/consumer_producer/main.cpp \
                               examples/consumer_producer/Queue.cpp
+
+EXTRA_DIST                  = README.txt COPYING.txt
 

@@ -1,5 +1,5 @@
 
-AC_INIT([c9y], [0.1])
+AC_INIT([c9y], [0.2])
 AM_INIT_AUTOMAKE([foreign])
 
 AM_PROG_LIBTOOL            

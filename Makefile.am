@@ -13,8 +13,7 @@ libc9y_la_SOURCES           = src/posix/Condition.cpp src/posix/Mutex.cpp \
 check_PROGRAMS              = c9y_unit_test
 
 c9y_unit_test_CXXFLAGS      = -I$(srcdir)/include $(SIGC_CFLAGS)
-c9y_unit_test_LDADD         = libc9y.la
-c9y_unit_test_LDFLAGS       = $(SIGC_LIBS) $(PTHREAD_LIBS) $(UNITTEST_LIBS)
+c9y_unit_test_LDADD         = libc9y.la $(SIGC_LIBS) $(PTHREAD_LIBS) $(UNITTEST_LIBS)
 c9y_unit_test_SOURCES       = test/c9y_unit_test.cpp test/ConditionTest.cpp \
                               test/MutexTest.cpp  test/ThreadTest.cpp
                          

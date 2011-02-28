@@ -1,4 +1,3 @@
-
 *.bmarks
 *.depend
 *.layout
@@ -7,10 +6,10 @@
 *.la
 *.in
 *.m4
+*.exe
 missing
 Makefile
 c9y_unit_test
-consumer_producer
 config.guess
 config.log
 config.status
@@ -25,4 +24,3 @@ obj
 .deps
 .libs
 autom4te.cache
-

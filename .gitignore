@@ -11,7 +11,7 @@ missing
 Makefile
 c9y_unit_test
 config.guess
-config.log
+config.logmake
 config.status
 config.sub
 configure

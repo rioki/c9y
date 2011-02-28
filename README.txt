@@ -27,7 +27,7 @@ Up to date source code can be found at http://www.github.com/rioki/c9y.
 
 0.2 (2011-02-15)
 
-  * ported all features to POSIX
+Ported all 0.1 features to POSIX.
 
 0.1 (2011-02-08)
   

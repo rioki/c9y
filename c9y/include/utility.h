@@ -18,33 +18,26 @@
 // along with c9y. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _COPR_PRODUCER_H_
-#define _COPR_PRODUCER_H_
+#ifndef _C9Y_UTILITY_H_
+#define _C9Y_UTILITY_H_
 
-#include <c9y/Thread.h>
+#include "config.h"
 
-namespace copr
+namespace c9y
 {
-    class Queue;
-
-    class Producer
-    {
-    public:
-
-        Producer(Queue& queue);
-
-        void start();
-
-        void finish();
-
-    private:
-        Queue& queue;
-
-        c9y::Thread thread;
-        bool running;
-
-        void production_loop();
-    };
+    /**
+     * Suspend Execution for a Defined Duration
+     *
+     * This function will supend the execution of the current thread for a
+     * specified duration.
+     *
+     * @param ms the ducration in milliseconds
+     *
+     * @note Depending on your operating system and environment the granularity
+     * can be up 10 ms.
+     **/
+    void sleep(unsigned int ms);
 }
 
 #endif
+

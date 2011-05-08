@@ -18,40 +18,55 @@
 // along with c9y. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "Producer.h"
+#include "Timer.h"
 
-#include <cstdlib>
-#include <c9y/utility.h>
+#include <iostream>
 
-#include "Queue.h"
+#include "Lock.h"
+#include "utility.h"
 
-namespace copr
+namespace c9y
 {
 //------------------------------------------------------------------------------
-    Producer::Producer(Queue& q)
-    : queue(q), thread(sigc::mem_fun(this, &Producer::production_loop)), running(false) {}
+    Timer::Timer(unsigned int i, sigc::slot<void> s)
+    : interval(i), slot(s), thread(sigc::mem_fun(this, &Timer::thread_func)) {}
 
-//------------------------------------------------------------------------------
-    void Producer::start()
+//------------------------------------------------------------------------------    
+    Timer::~Timer() 
     {
-        running = true;
+        stop();
+    }
+    
+//------------------------------------------------------------------------------
+    void Timer::start()
+    {
         thread.start();
     }
-
+    
 //------------------------------------------------------------------------------
-    void Producer::finish()
+    void Timer::stop()
     {
-        running = false;
-        thread.join();
+        Lock<Mutex> lock(exec_mutex);
+        thread.kill();
     }
-
+    
 //------------------------------------------------------------------------------
-    void Producer::production_loop()
+    void Timer::thread_func()
     {
-        while (running)
+        while (true)
         {
-            c9y::sleep(rand() % 10);
-            queue.push(rand());
+            sleep(interval);
+            {
+                Lock<Mutex> lock(exec_mutex);
+                try
+                {
+                    slot();
+                }
+                catch (const std::exception& ex)
+                {
+                    std::cerr << ex.what() << std::endl;
+                }
+            }
         }
     }
 }

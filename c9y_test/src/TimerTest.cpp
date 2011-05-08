@@ -18,33 +18,35 @@
 // along with c9y. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _COPR_CONSUMER_H_
-#define _COPR_CONSUMER_H_
+#include <UnitTest++/UnitTest++.h>
 
-#include <c9y/Thread.h>
+#include "Timer.h"
+#include "utility.h"
 
-namespace copr
+SUITE(Timer)
 {
-    class Queue;
-
-    class Consumer
+//------------------------------------------------------------------------------
+    struct TimerFixture
     {
-    public:
-
-        Consumer(Queue& queue);
-
-        void start();
-
-        void finish();
-
-    private:
-        Queue& queue;
-
-        c9y::Thread thread;
-        bool running;
-
-        void consumption_loop();
+        unsigned int tick_count;
+        
+        TimerFixture()
+        : tick_count(0) {}
+        
+        void on_tick()
+        {
+            tick_count++;
+        }
     };
-}
 
-#endif
+//------------------------------------------------------------------------------    
+    TEST_FIXTURE(TimerFixture, run_time)
+    {
+        c9y::Timer timer(20, sigc::mem_fun(this, &TimerFixture::on_tick));
+        timer.start();
+        c9y::sleep(110);
+        timer.stop();
+        
+        CHECK_EQUAL(5, tick_count);
+    }
+}

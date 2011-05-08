@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Workspace Name="c9y" Database="./c9y.tags">
+  <Project Name="c9y" Path="c9y/c9y.project" Active="No"/>
+  <Project Name="c9y_test" Path="c9y_test/c9y_test.project" Active="Yes"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Project Name="c9y" ConfigName="Debug"/>
+      <Project Name="c9y_test" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="no">
+      <Project Name="c9y" ConfigName="Release"/>
+      <Project Name="c9y_test" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>

@@ -18,29 +18,27 @@
 // along with c9y. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <cstdlib>
-#include <ctime>
+#include "utility.h"
 
-#include <c9y/utility.h>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
-#include "Queue.h"
-#include "Producer.h"
-#include "Consumer.h"
+#ifdef _POSIX
+#include <unistd.h>
+#endif
 
-int main()
+namespace c9y
 {
-    srand(time(NULL));
-
-    copr::Queue queue;
-    copr::Producer producer(queue);
-    copr::Consumer consumer(queue);
-
-    producer.start();
-    consumer.start();
-
-    // run 10 s
-    c9y::sleep(10000);
-
-    producer.finish();
-    consumer.finish();
+    void sleep(unsigned int ms)
+    {
+        #ifdef _WIN32
+        Sleep(ms);
+        #endif
+        
+        #ifdef _POSIX
+        usleep(ms * 1000);
+        #endif
+    }
 }
+

@@ -18,33 +18,10 @@
 // along with c9y. If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _COPR_QUEUE_H_
-#define _COPR_QUEUE_H_
+#include <UnitTest++/UnitTest++.h>
 
-#include <queue>
-#include <c9y/Mutex.h>
-#include <c9y/Condition.h>
-
-namespace copr
+int main()
 {
-    class Queue
-    {
-    public:
-
-        Queue();
-
-        void push(unsigned int value);
-
-        unsigned int pop();
-
-        unsigned int get_size() const;
-
-    private:
-        mutable c9y::Mutex mutex;
-        c9y::Condition queue_not_empty;
-        c9y::Condition queue_not_full;
-        std::queue<unsigned int> queue;
-    };
+    return UnitTest::RunAllTests();
 }
 
-#endif

@@ -3,20 +3,20 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="src/Condition.cpp"/>
-    <File Name="src/Mutex.cpp"/>
-    <File Name="src/Thread.cpp"/>
-    <File Name="src/utility.cpp"/>
-    <File Name="src/Timer.cpp"/>
+    <File Name="Condition.cpp"/>
+    <File Name="Mutex.cpp"/>
+    <File Name="Thread.cpp"/>
+    <File Name="utility.cpp"/>
+    <File Name="Timer.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
-    <File Name="include/Condition.h"/>
-    <File Name="include/config.h"/>
-    <File Name="include/Lock.h"/>
-    <File Name="include/Mutex.h"/>
-    <File Name="include/Thread.h"/>
-    <File Name="include/utility.h"/>
-    <File Name="include/Timer.h"/>
+    <File Name="Condition.h"/>
+    <File Name="config.h"/>
+    <File Name="Lock.h"/>
+    <File Name="Mutex.h"/>
+    <File Name="Thread.h"/>
+    <File Name="utility.h"/>
+    <File Name="Timer.h"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Settings Type="Dynamic Library">
@@ -31,7 +31,6 @@
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g" C_Options="-g" Required="yes" PreCompiledHeader="">
-        <IncludePath Value="include"/>
         <IncludePath Value="$(SIGC_DIR)/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
@@ -63,8 +62,7 @@
       </AdditionalRules>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="" C_Options="" Required="yes" PreCompiledHeader="">
-        <IncludePath Value="include"/>
+      <Compiler Options="" C_Options="" Required="yes" PreCompiledHeader=""> 
         <IncludePath Value="$(SIGC_DIR)/include"/>
       </Compiler>
       <Linker Options="-O2" Required="yes">

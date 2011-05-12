@@ -21,6 +21,7 @@
 #include "Thread.h"
 
 #include <stdexcept>
+#include <iostream>
 
 namespace c9y
 {
@@ -29,7 +30,14 @@ namespace c9y
     DWORD WINAPI threadproc(LPVOID data)
     {
         Thread* thread = reinterpret_cast<Thread*>(data);
-        thread->slot();
+        try
+        {
+            thread->slot();
+        }
+        catch (const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+        }
         return 0;
     }
     #endif
@@ -137,7 +145,7 @@ namespace c9y
         #ifdef _POSIX
         if (!valid)
         {
-            throw std::logic_error("Trying to join unstarted thread.");
+            return;
         }
 
         int ret = pthread_join(thread, NULL);
@@ -168,7 +176,7 @@ namespace c9y
         #ifdef _POSIX
         if (!valid)
         {
-            throw std::logic_error("Trying to kill unstarted thread.");
+            return;
         }
         pthread_cancel(thread);
         valid = false;

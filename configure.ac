@@ -1,5 +1,5 @@
 
-AC_INIT([c9y], [0.2.1])
+AC_INIT([c9y], [r3])
 AM_INIT_AUTOMAKE([foreign])
 
 AM_PROG_LIBTOOL            
@@ -23,15 +23,5 @@ AC_CHECK_LIB([UnitTest++], [main], [UNITTEST_LIBS="-lUnitTest++"],
     AC_WARN("UnitTest++ not found."))
 AC_SUBST(UNITTEST_LIBS)
 
-AC_OUTPUT([
-    Makefile
-    include/Makefile
-    include/c9y/Makefile
-    src/Makefile
-    src/posix/Makefile
-    src/win32/Makefile
-    test/Makefile
-    examples/Makefile
-    examples/consumer_producer/Makefile
-])
+AC_OUTPUT([Makefile])
 

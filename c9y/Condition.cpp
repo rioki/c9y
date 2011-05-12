@@ -35,7 +35,7 @@ namespace c9y
         }
         #endif
         
-        #if _POSIX
+        #ifdef _POSIX
         int ret = pthread_mutex_init(&mutex, NULL);
         if (ret != 0)
         {

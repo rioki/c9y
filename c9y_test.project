@@ -9,9 +9,6 @@
     <File Name="test/main.cpp"/>
     <File Name="test/TimerTest.cpp"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug">
-    <Project Name="c9y"/>
-  </Dependencies>
   <Dependencies Name="Release">
     <Project Name="c9y"/>
   </Dependencies>
@@ -106,4 +103,7 @@
       </AdditionalRules>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug">
+    <Project Name="c9y"/>
+  </Dependencies>
 </CodeLite_Project>

@@ -2,12 +2,12 @@
 <CodeLite_Project Name="c9y_test" InternalType="Console">
   <Description/>
   <Dependencies/>
-  <VirtualDirectory Name="src">
-    <File Name="ConditionTest.cpp"/>
-    <File Name="MutexTest.cpp"/>
-    <File Name="ThreadTest.cpp"/>
-    <File Name="main.cpp"/>
-    <File Name="TimerTest.cpp"/>
+  <VirtualDirectory Name="Source Files">
+    <File Name="test/ConditionTest.cpp"/>
+    <File Name="test/MutexTest.cpp"/>
+    <File Name="test/ThreadTest.cpp"/>
+    <File Name="test/main.cpp"/>
+    <File Name="test/TimerTest.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug">
     <Project Name="c9y"/>
@@ -27,12 +27,12 @@
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g" C_Options="-g" Required="yes" PreCompiledHeader="">
-        <IncludePath Value="../c9y"/>
+        <IncludePath Value="include/c9y"/>
         <IncludePath Value="$(UNIT_TEST_DIR)/include"/>
         <IncludePath Value="$(SIGC_DIR)/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
-        <LibraryPath Value="../c9y/$(ConfigurationName)"/>
+        <LibraryPath Value="$(ConfigurationName)"/>
         <LibraryPath Value="$(UNIT_TEST_DIR)/lib"/>
         <LibraryPath Value="$(SIGC_DIR)/lib"/>
         <Library Value="c9y"/>
@@ -67,12 +67,12 @@
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="" C_Options="" Required="yes" PreCompiledHeader="">
-        <IncludePath Value="../c9y"/>
+        <IncludePath Value="include/c9y"/>
         <IncludePath Value="$(UNIT_TEST_DIR)/include"/>
         <IncludePath Value="$(SIGC_DIR)/include"/>
       </Compiler>
       <Linker Options="-O2" Required="yes">
-        <LibraryPath Value="../c9y/$(ConfigurationName)"/>
+        <LibraryPath Value="$(ConfigurationName)"/>
         <LibraryPath Value="$(UNIT_TEST_DIR)/lib"/>
         <LibraryPath Value="$(SIGC_DIR)/lib"/>
         <Library Value="c9y"/>

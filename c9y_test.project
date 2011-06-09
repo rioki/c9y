@@ -9,9 +9,6 @@
     <File Name="test/main.cpp"/>
     <File Name="test/TimerTest.cpp"/>
   </VirtualDirectory>
-  <Dependencies Name="Release">
-    <Project Name="c9y"/>
-  </Dependencies>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="">
@@ -103,6 +100,9 @@
       </AdditionalRules>
     </Configuration>
   </Settings>
+  <Dependencies Name="Release">
+    <Project Name="c9y"/>
+  </Dependencies>
   <Dependencies Name="Debug">
     <Project Name="c9y"/>
   </Dependencies>

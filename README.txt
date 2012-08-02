@@ -20,6 +20,10 @@ Up to date source code can be found at http://www.github.com/rioki/c9y.
 
 4. Changes
 
+0.2.2
+
+  * implements makefile builds for all targets
+
 0.2.1 (2011-02-28)
 
   * fixes makefile build for MinGW (win32)

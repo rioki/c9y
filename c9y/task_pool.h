@@ -21,43 +21,57 @@
 // SOFTWARE.
 // 
 
+#ifndef _C9Y_TASK_POOL_H_
+#define _C9Y_TASK_POOL_H_
+
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+#include <queue>
+
+#include "defines.h"
+
 #include "thread_pool.h"
 
 namespace c9y
 {
-    thread_pool::thread_pool() noexcept {}
-
-    thread_pool::thread_pool(std::function<void()> thread_func, size_t concurency)
+    class C9Y_EXPORT task_pool
     {
-        for (size_t i = 0; i < concurency; i++)
-        {
-            threads.emplace_back(std::thread(thread_func));
-        }
-    }
+    public:
+        
+        task_pool(size_t concurency = std::thread::hardware_concurrency());
 
-    thread_pool::thread_pool(thread_pool&& other) noexcept
-    {
-        swap(other);
-    }
+        task_pool(const task_pool&) = delete;
 
-    thread_pool::~thread_pool() {}
+        ~task_pool();
 
-    thread_pool& thread_pool::operator = (thread_pool&& other) noexcept
-    {
-        swap(other);
-        return *this;
-    }
+        task_pool& operator = (const task_pool&) = delete;
 
-    void thread_pool::join()
-    {
-        for (auto& thread : threads)
-        {
-            thread.join();
-        }
-    }
+        void async(std::function<void ()> task);
 
-    void thread_pool::swap(thread_pool& other) noexcept
-    {
-        threads.swap(other.threads);
-    }
+        void sync(std::function<void()> task);
+
+        void run();
+        
+    private:
+        size_t                            concurency;
+        std::atomic<unsigned int>         ref_count;
+
+        std::mutex                        amutex;
+        std::condition_variable           acond;
+        std::queue<std::function<void()>> atasks;
+
+        std::mutex                        smutex;
+        std::condition_variable           scond;
+        std::queue<std::function<void()>> stasks;
+
+        thread_pool                       pool;
+
+        void execute();
+
+        std::function<void()> get_next_atask();
+        std::function<void()> get_next_stask();
+    };
 }
+
+#endif

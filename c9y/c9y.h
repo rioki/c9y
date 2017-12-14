@@ -26,5 +26,7 @@
 
 #include "defines.h"
 #include "thread_pool.h"
+#include "task_pool.h"
+#include "ctrlflow.h"
 
 #endif

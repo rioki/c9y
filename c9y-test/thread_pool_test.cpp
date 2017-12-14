@@ -21,43 +21,41 @@
 // SOFTWARE.
 // 
 
-#include "thread_pool.h"
+#include <atomic>
 
-namespace c9y
+#include <c9y/c9y.h>
+
+#include "rtest.h"
+
+SUITE(thread_pool)
 {
-    thread_pool::thread_pool() noexcept {}
-
-    thread_pool::thread_pool(std::function<void()> thread_func, size_t concurency)
+    TEST(create)
     {
-        for (size_t i = 0; i < concurency; i++)
-        {
-            threads.emplace_back(std::thread(thread_func));
-        }
+        std::atomic<unsigned int> count(0);
+
+        c9y::thread_pool pool([&]() {
+            count++;
+        }, 2);
+        pool.join();
+
+        CHECK_EQUAL(2, (unsigned int)count);
     }
 
-    thread_pool::thread_pool(thread_pool&& other) noexcept
+    TEST(default_contructor)
     {
-        swap(other);
+        c9y::thread_pool pool();
     }
 
-    thread_pool::~thread_pool() {}
-
-    thread_pool& thread_pool::operator = (thread_pool&& other) noexcept
+    TEST(move)
     {
-        swap(other);
-        return *this;
-    }
+        std::atomic<unsigned int> count(0);
+        c9y::thread_pool pool;
 
-    void thread_pool::join()
-    {
-        for (auto& thread : threads)
-        {
-            thread.join();
-        }
-    }
+        pool = c9y::thread_pool([&]() {
+            count++;
+        }, 2);
+        pool.join();
 
-    void thread_pool::swap(thread_pool& other) noexcept
-    {
-        threads.swap(other.threads);
+        CHECK_EQUAL(2, (unsigned int)count);
     }
 }

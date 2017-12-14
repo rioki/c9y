@@ -35,15 +35,23 @@ namespace c9y
     class C9Y_EXPORT thread_pool
     {
     public:
+        thread_pool() noexcept;
+
         thread_pool(std::function<void ()> thread_func, size_t concurency);
 
         thread_pool(const thread_pool&) = delete;
+
+        thread_pool(thread_pool&& other) noexcept;
 
         ~thread_pool();
 
         thread_pool& operator = (const thread_pool&) = delete;
 
+        thread_pool& operator = (thread_pool&& other) noexcept;
+
         void join();
+
+        void swap(thread_pool& other) noexcept;
 
     private:
         std::vector<std::thread> threads;

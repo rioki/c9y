@@ -139,5 +139,4 @@ namespace rtest
                                                                                                    \
     }
 
-
 #endif

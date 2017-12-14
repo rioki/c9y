@@ -18,6 +18,7 @@ DIST_FILES = $(C9YHDR) $(C9YSRC) $(TSTHDR) $(TSTSRC) $(EXTRA_DIST)
 ifeq ($(OS), Windows_NT)
   EXEEXT    = .exe  
   LIBEXT    = .a 
+  LDFLAGS  += -lwinmm
 else
   EXEEXT    =
   LIBEXT    = .so 
@@ -34,7 +35,7 @@ lib/libc9y.a: bin/c9y.dll
 bin/c9y.dll: $(patsubst %.cpp, .obj/%.o, $(C9YSRC))
 	mkdir -p bin
 	mkdir -p lib
-	$(CXX) -shared -fPIC $(CXXFLAGS) $(LDFLAGS) $^ -o $@ -Wl,--out-implib=lib/libc9y.a
+	$(CXX) -shared -fPIC $(CXXFLAGS) $^ -o $@ -Wl,--out-implib=lib/libc9y.a $(LDFLAGS)
 else
 lib/libc9y$(LIBEXT): $(patsubst %.cpp, .obj/%.o, $(C9YSRC))
 	mkdir -p lib

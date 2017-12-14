@@ -19,45 +19,41 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-// 
+//
 
-#include "thread_pool.h"
+#include <atomic>
+#include <ctime>
 
-namespace c9y
+#include <c9y/c9y.h>
+
+#include "rtest.h"
+
+SUITE(task_pool)
 {
-    thread_pool::thread_pool() noexcept {}
-
-    thread_pool::thread_pool(std::function<void()> thread_func, size_t concurency)
+    TEST(fallthrough)
     {
-        for (size_t i = 0; i < concurency; i++)
-        {
-            threads.emplace_back(std::thread(thread_func));
-        }
+        c9y::task_pool pool;
+        pool.run();
+    
     }
 
-    thread_pool::thread_pool(thread_pool&& other) noexcept
+    TEST(create)
     {
-        swap(other);
-    }
+        std::atomic<unsigned int> count(0);
 
-    thread_pool::~thread_pool() {}
+        auto task = [&]() {
+            count++;
+        };
 
-    thread_pool& thread_pool::operator = (thread_pool&& other) noexcept
-    {
-        swap(other);
-        return *this;
-    }
+        c9y::task_pool pool(2);
 
-    void thread_pool::join()
-    {
-        for (auto& thread : threads)
-        {
-            thread.join();
-        }
-    }
+        pool.async(task);
+        pool.async(task);
+        pool.async(task);
+        pool.sync(task);
 
-    void thread_pool::swap(thread_pool& other) noexcept
-    {
-        threads.swap(other.threads);
+        pool.run();
+
+        CHECK_EQUAL(4, (unsigned int)count);
     }
 }

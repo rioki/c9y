@@ -35,22 +35,55 @@
 
 namespace c9y
 {
+    /**
+     * Task Pool
+     *
+     * A task pool is a wrapper around a thread pool that allow heterogenous task execution.
+     *
+     * There are two streams of execution, one asyncrounous and one syncronous. 
+     * The so called asnycronous stream is executed on the thread pool. The 
+     * syncronous stream is executed on the main thread. This allows to build
+     * execution patterns where something is done on the thread pool and once
+     * compleated synced back with the global state in the main thread, without 
+     * locking.
+     *
+     * @see async
+     **/
     class C9Y_EXPORT task_pool
     {
     public:
-        
+        /**
+         * Construct a task pool.
+         *
+         * @param concurency the number of thread to create
+         **/
         task_pool(size_t concurency = std::thread::hardware_concurrency());
 
         task_pool(const task_pool&) = delete;
-
+        
+        /**
+         * Destructor
+         **/
         ~task_pool();
 
         task_pool& operator = (const task_pool&) = delete;
 
+        /** 
+         * Schedule task in the asyncronous execution stream.
+         **/
         void async(std::function<void ()> task);
 
+        /** 
+         * Schedule task in the syncronous execution stream.
+         **/
         void sync(std::function<void()> task);
 
+        /**
+         * Execute all pending tasks. 
+         * 
+         * This method will run until there are no tasks to execute. 
+         * Taks can shedule further tasks, which are then executed in turn.
+         **/
         void run();
         
     private:

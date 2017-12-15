@@ -38,8 +38,28 @@ namespace c9y
     struct base_handle {
         virtual ~base_handle() {}
     };
+    
+    /**
+     * Handle to a execution context.
+     *
+     * Some functions, such as start_idle return a handle that can be 
+     * used to call stop_idle on. From the users perspective, these handles
+     * should be considered opaque.
+     **/
     typedef std::shared_ptr<base_handle> handle;
-
+    
+    /**
+     * Executa a task asyncronously and return the result in a syncronous call.
+     *
+     * @param task the task to execute
+     * @param callback the callback that is called when the task finishes
+     *
+     * The callback gets two values, an exception_ptr and the resutl value. 
+     * If an exception is thrown during the execution of the task the exception
+     * is captured and handed of to the callback. 
+     * 
+     * @see throw_on_error
+     **/
     template <typename result_t>
     void async(task_pool& tp, std::function<result_t()> task, std::function<void(std::exception_ptr err, result_t)> callback)
     {
@@ -82,7 +102,14 @@ namespace c9y
 
     C9Y_EXPORT
     void timer(task_pool& tp, std::function<bool()> task, unsigned int intervall);
-
+    
+    /**
+     * Convinience fucntion for error handling.
+     *
+     * Many function return an exception_ptr. If the task threw an exception, is may
+     * be sensible to rethrow that exception in the main thread, thus terminating 
+     * the execution. 
+     **/
     C9Y_EXPORT
     void throw_on_error(std::exception_ptr err);
 }

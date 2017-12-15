@@ -112,33 +112,76 @@ namespace c9y
         #endif
     }
 
-    struct timer_info
+    struct timer_info : public base_handle
     {
-        unsigned int intervall;
-        unsigned int last;
+        std::atomic<bool>         running;
+        std::function<bool()>     task;
+        std::atomic<unsigned int> intervall;
+        std::atomic<unsigned int> last;
+
+        timer_info(std::function<bool ()> t, unsigned int i)
+        {
+            running   = true;
+            task      = t;
+            intervall = i;
+            last      = get_ms_time();
+        }
     };
 
-    void timer(task_pool& tp, std::function<bool()> task, unsigned int intervall)
+    void do_timer(task_pool& tp, std::shared_ptr<timer_info> handle)
+    {
+        assert(handle);
+
+        if (handle->running)
+        {            
+            assert(handle->task);
+            unsigned int now = get_ms_time();
+            unsigned int next = handle->last + handle->intervall;
+
+            if (now >= next)
+            {
+                handle->last    = get_ms_time(); 
+                handle->running = handle->task();                       
+            }
+            
+            if (handle->running)
+            {
+                tp.sync(std::bind(do_timer, std::ref(tp), handle));
+            }            
+        }
+    }
+
+    handle start_timer(task_pool& tp, std::function<bool()> task, unsigned int intervall)
     {
         if (!task)
         {
             throw std::invalid_argument(__FUNCTION__);
         }
 
-        auto ti = std::make_shared<timer_info>();
-        ti->intervall = intervall;
-        ti->last      = get_ms_time();
+        auto h = std::make_shared<timer_info>(task, intervall);
+        tp.sync(std::bind(do_timer, std::ref(tp), h));
 
-        start_idle(tp, [task, ti] () -> bool {            
-            unsigned int now = get_ms_time();
-            unsigned int next = ti->last + ti->intervall;            
-            if (now >= next)
-            {
-                ti->last = now;                
-                return task();
-            }
-        });
+        return h;
+    }
 
+    void set_intervall(handle h, unsigned int intervall)
+    {
+        auto hnd = std::dynamic_pointer_cast<timer_info>(h);
+        if (!hnd)
+        {
+            throw std::invalid_argument(__FUNCTION__);
+        }
+        hnd->intervall = intervall; 
+    }
+
+    void stop_timer(handle h)
+    {
+        auto hnd = std::dynamic_pointer_cast<timer_info>(h);
+        if (!hnd)
+        {
+            throw std::invalid_argument(__FUNCTION__);
+        }
+        hnd->running = false;    
     }
 
     void throw_on_error(std::exception_ptr err)

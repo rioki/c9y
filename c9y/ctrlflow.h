@@ -100,8 +100,41 @@ namespace c9y
     C9Y_EXPORT
     unsigned int get_ms_time();
 
+    /**
+     * Start a timer. 
+     * 
+     * @param tp the task pool
+     * @param task the task to execute
+     * @param intervall the intervall to execute the task at
+     * 
+     * This function will execute the task at the given intervall until either 
+     * stop_timer is called or the task returns false. 
+     * 
+     * @note The timer is implemented as a spinn timer, that is it will
+     * keep queueing syncronous tasks. Thus using timers are not more
+     * efficient than idle functions. Use only timers when a function should
+     * be called in a given time frame.
+     * 
+     * @see stop_timer
+     * @see set_intervall
+     **/
     C9Y_EXPORT
-    void timer(task_pool& tp, std::function<bool()> task, unsigned int intervall);
+    handle start_timer(task_pool& tp, std::function<bool()> task, unsigned int intervall);
+
+    /**
+     * Change the intervall on a timer. 
+     * 
+     * @param h handle
+     * @param intervall the intervall to set
+     **/
+    C9Y_EXPORT
+    void set_intervall(handle h, unsigned int intervall);
+
+    /**
+     * Stop the timer.
+     **/
+    C9Y_EXPORT 
+    void stop_timer(handle h);
     
     /**
      * Convinience fucntion for error handling.

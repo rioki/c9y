@@ -148,7 +148,7 @@ SUITE(control_flow)
 
         c9y::task_pool pool;
 
-        c9y::timer(pool, [&]() {
+        c9y::start_timer(pool, [&]() {
             stid = std::this_thread::get_id();
             result++;
             return (result < 5);

@@ -1,7 +1,8 @@
 
 # Concurency
 
-
+The c9y librart implements a number of C++ primitives that facilitate programing
+concurent code. 
 
 ## License
 

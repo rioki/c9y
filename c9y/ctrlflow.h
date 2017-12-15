@@ -78,12 +78,27 @@ namespace c9y
         });
     }
 
+    // async<void>(...)
     C9Y_EXPORT
     void async(task_pool& tp, std::function<void()> task, std::function<void(std::exception_ptr err)> callback);
 
+    /**
+     * Start a syncronous idle task.
+     * 
+     * @param tp the task pool
+     * @param task the task to execute.
+     * 
+     * This function will shedule the task on the syncoinous stream of
+     * tasks until either stop_idle is called or the task returns false.
+     **/
     C9Y_EXPORT
     handle start_idle(task_pool& tp, std::function<bool ()> task);
 
+    /**
+     * Stop the idle task.
+     * 
+     * @param h the thandle of the timer
+     **/
     C9Y_EXPORT 
     void stop_idle(handle h);
 
@@ -101,7 +116,7 @@ namespace c9y
     unsigned int get_ms_time();
 
     /**
-     * Start a timer. 
+     * Start a syncronous timer. 
      * 
      * @param tp the task pool
      * @param task the task to execute
@@ -124,7 +139,7 @@ namespace c9y
     /**
      * Change the intervall on a timer. 
      * 
-     * @param h handle
+     * @param h the thandle of the timer
      * @param intervall the intervall to set
      **/
     C9Y_EXPORT
@@ -132,6 +147,8 @@ namespace c9y
 
     /**
      * Stop the timer.
+     * 
+     * @param h the thandle of the timer
      **/
     C9Y_EXPORT 
     void stop_timer(handle h);

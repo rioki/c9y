@@ -27,10 +27,10 @@
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
-#include <queue>
 
 #include "defines.h"
 #include "thread_pool.h"
+#include "queue.h"
 
 namespace c9y
 {
@@ -86,23 +86,15 @@ namespace c9y
         void run();
         
     private:
-        size_t                            concurency;
-        std::atomic<unsigned int>         ref_count;
+        size_t                       concurency;
+        std::atomic<unsigned int>    ref_count;
 
-        std::mutex                        amutex;
-        std::condition_variable           acond;
-        std::queue<std::function<void()>> atasks;
+        queue<std::function<void()>> atasks;
+        queue<std::function<void()>> stasks;
 
-        std::mutex                        smutex;
-        std::condition_variable           scond;
-        std::queue<std::function<void()>> stasks;
-
-        thread_pool                       pool;
+        thread_pool                  pool;
 
         void execute();
-
-        std::function<void()> get_next_atask();
-        std::function<void()> get_next_stask();
     };
 }
 

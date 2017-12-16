@@ -33,93 +33,49 @@ namespace c9y
     void task_pool::async(std::function<void()> atask)
     {
         ref_count++;
-        std::unique_lock<std::mutex> lock(amutex);
-        atasks.push(atask);
-        acond.notify_one();
+        atasks.push(atask);        
     }
 
     void task_pool::sync(std::function<void()> stask)
     {
         ref_count++;
-        std::unique_lock<std::mutex> lock(smutex);
-        stasks.push(stask);
-        scond.notify_one();
+        stasks.push(stask);        
     }
 
     void task_pool::run()
     {
+        std::function<void()> stask;
+
         pool = thread_pool([this] () {execute();}, concurency);
         
         while (ref_count > 0)
-        {
-            auto stask = get_next_stask();
-            if (stask)
+        {            
+            if (stasks.pop_wait(stask))
             {
                 stask();
                 ref_count--;
             }
         }
 
-        acond.notify_all();        
+        atasks.wake();
 
         pool.join();
     }
 
     void task_pool::execute()
     {
+        std::function<void()> atask;
+
         while (ref_count > 0)
         {
-            auto atask = get_next_atask();
-            if (atask)
+            if (atasks.pop_wait(atask))
             {
                 atask();
                 ref_count--;
             }
         }
         
-        acond.notify_all();
-        scond.notify_all();
-    }
-
-    std::function<void()> task_pool::get_next_atask()
-    {
-        std::unique_lock<std::mutex> lock(amutex);
-
-        if (atasks.empty())
-        {
-            acond.wait(lock);
-        }
-
-        if (!atasks.empty())
-        {
-            auto atask = atasks.front();
-            atasks.pop();
-            return atask;
-        }
-        else
-        {
-            return std::function<void()>();
-        }
-    }
-
-    std::function<void()> task_pool::get_next_stask()
-    {
-        std::unique_lock<std::mutex> lock(smutex);
-
-        if (stasks.empty())
-        {
-            scond.wait(lock);
-        }
-
-        if (!stasks.empty())
-        {
-            auto stask = stasks.front();
-            stasks.pop();
-            return stask;
-        }
-        else
-        {
-            return std::function<void()>();
-        }
+        atasks.wake();
+        stasks.wake();
     }
 }

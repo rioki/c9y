@@ -106,7 +106,7 @@ namespace c9y
             std::unique_lock<std::mutex> lock(mutex);
             if (!container.empty())
             {
-                container.front();
+                value = container.front();
                 container.pop_front();
                 return true;
             }
@@ -129,7 +129,8 @@ namespace c9y
         bool pop_wait(value_type& value)
         {                    
             std::unique_lock<std::mutex> lock(mutex);
-            if (!container.empty())
+            
+            if (container.empty())
             {
                 cond.wait(lock);
             }

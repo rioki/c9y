@@ -66,7 +66,7 @@ SUITE(queue)
     TEST(consumer_producer_wait)
     {
         c9y::queue<int> q;
-        std::atomic<unsigned int> count(0);        
+        std::atomic<unsigned int> count(0);
 
         c9y::thread_pool prod([&] () {
             for (int i = 1; i < 101; i++)

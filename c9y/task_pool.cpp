@@ -60,7 +60,7 @@ namespace c9y
             }
         }
 
-        acond.notify_all();
+        acond.notify_all();        
 
         pool.join();
     }
@@ -76,7 +76,7 @@ namespace c9y
                 ref_count--;
             }
         }
-
+        
         acond.notify_all();
         scond.notify_all();
     }

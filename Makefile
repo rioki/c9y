@@ -3,7 +3,7 @@
 VERSION   = 0.1.0
 
 CXX      ?= g++ 
-CXXFLAGS := -std=c++0x -I$(shell pwd) $(CXXFLAGS)
+CXXFLAGS := -std=c++14 -I$(shell pwd) $(CXXFLAGS)
 LDFLAGS  += 
 prefix   ?= /usr/local
 

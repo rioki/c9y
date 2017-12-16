@@ -30,7 +30,6 @@
 #include <queue>
 
 #include "defines.h"
-
 #include "thread_pool.h"
 
 namespace c9y

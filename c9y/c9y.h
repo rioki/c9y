@@ -26,6 +26,7 @@
 
 #include "defines.h"
 #include "thread_pool.h"
+#include "queue.h"
 #include "task_pool.h"
 #include "ctrlflow.h"
 

@@ -1,6 +1,6 @@
-// 
+//
 // c9y - concurrency
-// Copyright(c) 2017 Sean Farrell
+// Copyright(c) 2017-2019 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -8,10 +8,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions :
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-// 
+//
 
 #include "ctrlflow.h"
 
@@ -36,7 +36,7 @@ namespace c9y
     void async(task_pool& tp, std::function<void()> task, std::function<void(std::exception_ptr err)> callback)
     {
         tp.async([&tp, task, callback]() {
-            std::exception_ptr err;
+            auto err = std::exception_ptr{};
             try
             {
                 task();
@@ -51,14 +51,11 @@ namespace c9y
 
     struct idle_handle : public base_handle
     {
-        std::atomic<bool>      running;
+        std::atomic<bool>      running = true;
         std::function<bool ()> task;
 
         idle_handle(std::function<bool ()> t)
-        {
-            running = true;
-            task = t;
-        }
+        : task(t) {}
     };
 
     void do_idle(task_pool& tp, std::shared_ptr<idle_handle> handle)
@@ -83,7 +80,7 @@ namespace c9y
         {
             throw std::invalid_argument(__FUNCTION__);
         }
-        
+
         auto h = std::make_shared<idle_handle>(task);
         tp.sync(std::bind(do_idle, std::ref(tp), h));
 
@@ -104,7 +101,7 @@ namespace c9y
     unsigned int get_ms_time()
     {
         #ifdef WINDOWS
-        return timeGetTime();            
+        return timeGetTime();
         #else
         struct timeval now;
         gettimeofday(&now, NULL);
@@ -114,18 +111,13 @@ namespace c9y
 
     struct timer_info : public base_handle
     {
-        std::atomic<bool>         running;
+        std::atomic<bool>         running = true;
         std::function<bool()>     task;
         std::atomic<unsigned int> intervall;
         std::atomic<unsigned int> last;
 
         timer_info(std::function<bool ()> t, unsigned int i)
-        {
-            running   = true;
-            task      = t;
-            intervall = i;
-            last      = get_ms_time();
-        }
+        : task(t), intervall(i), last(get_ms_time()) {}
     };
 
     void do_timer(task_pool& tp, std::shared_ptr<timer_info> handle)
@@ -133,21 +125,21 @@ namespace c9y
         assert(handle);
 
         if (handle->running)
-        {            
+        {
             assert(handle->task);
-            unsigned int now = get_ms_time();
-            unsigned int next = handle->last + handle->intervall;
+            auto now = get_ms_time();
+            auto next = handle->last + handle->intervall;
 
             if (now >= next)
             {
-                handle->last    = get_ms_time(); 
-                handle->running = handle->task();                       
+                handle->last    = get_ms_time();
+                handle->running = handle->task();
             }
-            
+
             if (handle->running)
             {
                 tp.sync(std::bind(do_timer, std::ref(tp), handle));
-            }            
+            }
         }
     }
 
@@ -171,7 +163,7 @@ namespace c9y
         {
             throw std::invalid_argument(__FUNCTION__);
         }
-        hnd->intervall = intervall; 
+        hnd->intervall = intervall;
     }
 
     void stop_timer(handle h)
@@ -181,7 +173,7 @@ namespace c9y
         {
             throw std::invalid_argument(__FUNCTION__);
         }
-        hnd->running = false;    
+        hnd->running = false;
     }
 
     void throw_on_error(std::exception_ptr err)

@@ -1,6 +1,6 @@
-// 
+//
 // c9y - concurrency
-// Copyright(c) 2017 Sean Farrell
+// Copyright(c) 2017-2019 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -8,10 +8,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions :
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
@@ -24,6 +24,7 @@
 #include <atomic>
 #include <ctime>
 #include <iostream>
+#include <array>
 
 #include <c9y/c9y.h>
 
@@ -33,10 +34,11 @@ SUITE(control_flow)
 {
     TEST(async)
     {
-        unsigned int result = 0;
-        std::thread::id atid, stid;
+        auto result = 0u;
+        auto atid = std::thread::id{};
+        auto stid = std::thread::id{};
 
-        c9y::task_pool pool;
+        auto pool = c9y::task_pool{};
 
         c9y::async<unsigned int>(pool, [&]() -> unsigned int {
             atid = std::this_thread::get_id();
@@ -55,9 +57,8 @@ SUITE(control_flow)
 
     TEST(async_exception)
     {
-        std::string err_msg;
-
-        c9y::task_pool pool;
+        auto err_msg = std::string{};
+        auto pool = c9y::task_pool{};
 
         c9y::async<unsigned int>(pool, [&]() -> unsigned int {
             throw std::runtime_error("A Problem");
@@ -79,9 +80,9 @@ SUITE(control_flow)
 
     TEST(async_void)
     {
-        std::thread::id atid, stid;
-
-        c9y::task_pool pool;
+        auto atid = std::thread::id{};
+        auto stid = std::thread::id{};
+        auto pool = c9y::task_pool{};
 
         c9y::async(pool, [&]() {
             atid = std::this_thread::get_id();
@@ -97,9 +98,8 @@ SUITE(control_flow)
 
     TEST(async_void_exception)
     {
-        std::string err_msg;
-
-        c9y::task_pool pool;
+        auto err_msg = std::string{};
+        auto pool = c9y::task_pool{};
 
         c9y::async(pool, [&]() {
             throw std::runtime_error("A Void Problem");
@@ -122,12 +122,11 @@ SUITE(control_flow)
     TEST(idle)
     {
         unsigned int result = 0;
-        std::thread::id stid;
+        auto stid = std::thread::id{};
 
-        c9y::task_pool pool;
+        auto pool = c9y::task_pool{};
 
-        c9y::handle handle;
-        handle = c9y::start_idle(pool, [&] () -> bool {
+        auto handle = c9y::start_idle(pool, [&] () {
             stid = std::this_thread::get_id();
             result++;
             return (result < 5);
@@ -140,13 +139,12 @@ SUITE(control_flow)
 
     TEST(timer)
     {
-        CHECK_EQUAL(1000, CLOCKS_PER_SEC);
+        auto result = 0u;
+        auto start = 0u;
+        auto end = 0u;
+        auto stid = std::thread::id{};
 
-        unsigned int result = 0;
-        unsigned int start, end;
-        std::thread::id stid;
-
-        c9y::task_pool pool;
+        auto pool = c9y::task_pool{};
 
         c9y::start_timer(pool, [&]() {
             stid = std::this_thread::get_id();
@@ -159,7 +157,7 @@ SUITE(control_flow)
         end = c9y::get_ms_time();
 
         unsigned int diff = end - start;
-        
+
         CHECK_EQUAL(5, result);
         CHECK(74 < diff);
         CHECK(std::this_thread::get_id() == stid);
@@ -167,9 +165,8 @@ SUITE(control_flow)
 
     TEST(async_and_idle)
     {
-        bool done = false;
-
-        c9y::task_pool pool;
+        auto done = false;
+        auto pool = c9y::task_pool{};
 
         auto ih = c9y::start_idle(pool, [&] () {
             // something stupid

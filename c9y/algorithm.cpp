@@ -21,41 +21,44 @@
 // SOFTWARE.
 //
 
-#include <atomic>
+#include "algorithm.h"
 
-#include <c9y/c9y.h>
+#include <cassert>
 
-#include "rtest.h"
-
-SUITE(thread_pool)
+namespace c9y
 {
-    TEST(create)
+    void _sequence_one(task_pool& tp, std::shared_ptr<std::list<std::function<void ()>>> shared_tasks, std::function<void(std::exception_ptr err)> callback)
     {
-        auto count = std::atomic<unsigned int>{0};
+        assert(shared_tasks);
+        assert(!shared_tasks->empty());
 
-        auto pool = c9y::thread_pool{[&]() {
-            count++;
-        }, 2};
-        pool.join();
+        auto task = shared_tasks->front();
+        assert(task);
+        try
+        {
+            task();
+        }
+        catch (...)
+        {
+            auto err = std::current_exception();
+            tp.sync([callback, err] () {
+                callback(err);
+            });
+            return;
+        }
 
-        CHECK_EQUAL(2, static_cast<unsigned int>(count));
-    }
-
-    TEST(default_contructor)
-    {
-        auto pool = c9y::thread_pool{};
-    }
-
-    TEST(move)
-    {
-        auto count = std::atomic<unsigned int>{0};
-        auto pool = c9y::thread_pool{};
-
-        pool = c9y::thread_pool{[&]() {
-            count++;
-        }, 2};
-        pool.join();
-
-        CHECK_EQUAL(2, static_cast<unsigned int>(count));
+        shared_tasks->pop_front();
+        if (shared_tasks->empty())
+        {
+            tp.sync([callback] () {
+                callback(std::exception_ptr{});
+            });
+        }
+        else
+        {
+            tp.async([&tp, shared_tasks, callback] () {
+                _sequence_one(tp, shared_tasks, callback);
+            });
+        }
     }
 }

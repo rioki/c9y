@@ -77,7 +77,7 @@ TEST(queue, consumer_producer_wait)
 
     auto cons = c9y::thread_pool{[&] () {
         int value = 0;
-        while (q.pop_wait(value))
+        while (q.pop_wait_for(value, 100ms))
         {
             count++;
             std::this_thread::sleep_for(3ms);

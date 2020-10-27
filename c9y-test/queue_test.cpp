@@ -26,71 +26,68 @@
 
 #include <c9y/c9y.h>
 
-#include "rtest.h"
+#include <gtest/gtest.h>
 
 using namespace std::chrono_literals;
 
-SUITE(queue)
+TEST(queue, create)
 {
-    TEST(create)
-    {
-        auto q = c9y::queue<int>{};
-    }
+    auto q = c9y::queue<int>{};
+}
 
-    TEST(consumer_producer)
-    {
-        auto q = c9y::queue<int>{};
-        auto count = std::atomic<unsigned int>{0};
+TEST(queue, consumer_producer)
+{
+    auto q = c9y::queue<int>{};
+    auto count = std::atomic<unsigned int>{0};
 
-        auto prod = c9y::thread_pool{[&] () {
-            for (int i = 1; i < 101; i++)
-            {
-                q.push(i);
-            }
-        }, 3};
+    auto prod = c9y::thread_pool{[&] () {
+        for (int i = 1; i < 101; i++)
+        {
+            q.push(i);
+        }
+    }, 3};
 
-        auto cons = c9y::thread_pool{[&] () {
-            int value = 0;
-            while (q.pop(value))
-            {
-                count++;
-                std::this_thread::sleep_for(1ms);
-            }
-        }, 3};
+    auto cons = c9y::thread_pool{[&] () {
+        int value = 0;
+        while (q.pop(value))
+        {
+            count++;
+            std::this_thread::sleep_for(1ms);
+        }
+    }, 3};
 
-        prod.join();
-        cons.join();
+    prod.join();
+    cons.join();
 
-        CHECK_EQUAL(300, static_cast<unsigned int>(count));
-    }
+    EXPECT_EQ(300, static_cast<unsigned int>(count));
+}
 
-    TEST(consumer_producer_wait)
-    {
-        auto q = c9y::queue<int>{};
-        auto count = std::atomic<unsigned int>{0};
+TEST(queue, consumer_producer_wait)
+{
+    auto q = c9y::queue<int>{};
+    auto count = std::atomic<unsigned int>{0};
 
-        auto prod = c9y::thread_pool{[&] () {
-            for (int i = 1; i < 101; i++)
-            {
-                q.push(i);
-                std::this_thread::sleep_for(5ms);
-            }
-        }, 3};
+    auto prod = c9y::thread_pool{[&] () {
+        for (int i = 1; i < 101; i++)
+        {
+            q.push(i);
+            std::this_thread::sleep_for(5ms);
+        }
+    }, 3};
 
-        auto cons = c9y::thread_pool{[&] () {
-            int value = 0;
-            while (q.pop_wait(value))
-            {
-                count++;
-                std::this_thread::sleep_for(3ms);
-            }
-        }, 3};
+    auto cons = c9y::thread_pool{[&] () {
+        int value = 0;
+        while (q.pop_wait(value))
+        {
+            count++;
+            std::this_thread::sleep_for(3ms);
+        }
+    }, 3};
 
-        prod.join();
-        std::this_thread::sleep_for(100ms);
-        q.wake();
-        cons.join();
+    prod.join();
+    std::this_thread::sleep_for(100ms);
+    q.wake();
+    cons.join();
 
-        CHECK_EQUAL(300, static_cast<unsigned int>(count));
-    }
+    EXPECT_EQ(300, static_cast<unsigned int>(count));
 }

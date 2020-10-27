@@ -25,37 +25,34 @@
 
 #include <c9y/c9y.h>
 
-#include "rtest.h"
+#include <gtest/gtest.h>
 
-SUITE(thread_pool)
+TEST(thread_pool, create)
 {
-    TEST(create)
-    {
-        auto count = std::atomic<unsigned int>{0};
+    auto count = std::atomic<unsigned int>{0};
 
-        auto pool = c9y::thread_pool{[&]() {
-            count++;
-        }, 2};
-        pool.join();
+    auto pool = c9y::thread_pool{[&]() {
+        count++;
+    }, 2};
+    pool.join();
 
-        CHECK_EQUAL(2, static_cast<unsigned int>(count));
-    }
+    EXPECT_EQ(2, static_cast<unsigned int>(count));
+}
 
-    TEST(default_contructor)
-    {
-        auto pool = c9y::thread_pool{};
-    }
+TEST(thread_pool, default_contructor)
+{
+    auto pool = c9y::thread_pool{};
+}
 
-    TEST(move)
-    {
-        auto count = std::atomic<unsigned int>{0};
-        auto pool = c9y::thread_pool{};
+TEST(thread_pool, move)
+{
+    auto count = std::atomic<unsigned int>{0};
+    auto pool = c9y::thread_pool{};
 
-        pool = c9y::thread_pool{[&]() {
-            count++;
-        }, 2};
-        pool.join();
+    pool = c9y::thread_pool{[&]() {
+        count++;
+    }, 2};
+    pool.join();
 
-        CHECK_EQUAL(2, static_cast<unsigned int>(count));
-    }
+    EXPECT_EQ(2, static_cast<unsigned int>(count));
 }

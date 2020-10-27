@@ -24,9 +24,6 @@
     <ClCompile Include="queue_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="rtest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="task_pool_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,10 +33,5 @@
     <ClCompile Include="algorithm_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="rtest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

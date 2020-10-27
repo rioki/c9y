@@ -28,160 +28,157 @@
 
 #include <c9y/c9y.h>
 
-#include "rtest.h"
+#include <gtest/gtest.h>
 
-SUITE(control_flow)
+TEST(control_flow, async)
 {
-    TEST(async)
-    {
-        auto result = 0u;
-        auto atid = std::thread::id{};
-        auto stid = std::thread::id{};
+    auto result = 0u;
+    auto atid = std::thread::id{};
+    auto stid = std::thread::id{};
 
-        auto pool = c9y::task_pool{};
+    auto pool = c9y::task_pool{};
 
-        c9y::async<unsigned int>(pool, [&]() -> unsigned int {
-            atid = std::this_thread::get_id();
-            return 5;
-        }, [&](std::exception_ptr err, unsigned int r) {
-            stid = std::this_thread::get_id();
-            result = r;
-        });
+    c9y::async<unsigned int>(pool, [&]() -> unsigned int {
+        atid = std::this_thread::get_id();
+        return 5;
+    }, [&](std::exception_ptr err, unsigned int r) {
+        stid = std::this_thread::get_id();
+        result = r;
+    });
 
-        pool.run();
+    pool.run();
 
-        CHECK(std::this_thread::get_id() != atid);
-        CHECK(std::this_thread::get_id() == stid);
-        CHECK_EQUAL(5, result);
-    }
+    EXPECT_TRUE(std::this_thread::get_id() != atid);
+    EXPECT_TRUE(std::this_thread::get_id() == stid);
+    EXPECT_EQ(5, result);
+}
 
-    TEST(async_exception)
-    {
-        auto err_msg = std::string{};
-        auto pool = c9y::task_pool{};
+TEST(control_flow, async_exception)
+{
+    auto err_msg = std::string{};
+    auto pool = c9y::task_pool{};
 
-        c9y::async<unsigned int>(pool, [&]() -> unsigned int {
-            throw std::runtime_error("A Problem");
-        }, [&](std::exception_ptr err, unsigned int r) {
-            try
-            {
-                std::rethrow_exception(err);
-            }
-            catch (std::runtime_error& ex)
-            {
-                err_msg = ex.what();
-            }
-        });
+    c9y::async<unsigned int>(pool, [&]() -> unsigned int {
+        throw std::runtime_error("A Problem");
+    }, [&](std::exception_ptr err, unsigned int r) {
+        try
+        {
+            std::rethrow_exception(err);
+        }
+        catch (std::runtime_error& ex)
+        {
+            err_msg = ex.what();
+        }
+    });
 
-        pool.run();
+    pool.run();
 
-        CHECK_EQUAL("A Problem", err_msg);
-    }
+    EXPECT_EQ("A Problem", err_msg);
+}
 
-    TEST(async_void)
-    {
-        auto atid = std::thread::id{};
-        auto stid = std::thread::id{};
-        auto pool = c9y::task_pool{};
+TEST(control_flow, async_void)
+{
+    auto atid = std::thread::id{};
+    auto stid = std::thread::id{};
+    auto pool = c9y::task_pool{};
 
-        c9y::async(pool, [&]() {
-            atid = std::this_thread::get_id();
-        }, [&](std::exception_ptr err) {
-            stid = std::this_thread::get_id();
-        });
+    c9y::async(pool, [&]() {
+        atid = std::this_thread::get_id();
+    }, [&](std::exception_ptr err) {
+        stid = std::this_thread::get_id();
+    });
 
-        pool.run();
+    pool.run();
 
-        CHECK(std::this_thread::get_id() != atid);
-        CHECK(std::this_thread::get_id() == stid);
-    }
+    EXPECT_TRUE(std::this_thread::get_id() != atid);
+    EXPECT_TRUE(std::this_thread::get_id() == stid);
+}
 
-    TEST(async_void_exception)
-    {
-        auto err_msg = std::string{};
-        auto pool = c9y::task_pool{};
+TEST(control_flow, async_void_exception)
+{
+    auto err_msg = std::string{};
+    auto pool = c9y::task_pool{};
 
-        c9y::async(pool, [&]() {
-            throw std::runtime_error("A Void Problem");
-        }, [&](std::exception_ptr err) {
-            try
-            {
-                std::rethrow_exception(err);
-            }
-            catch (std::runtime_error& ex)
-            {
-                err_msg = ex.what();
-            }
-        });
+    c9y::async(pool, [&]() {
+        throw std::runtime_error("A Void Problem");
+    }, [&](std::exception_ptr err) {
+        try
+        {
+            std::rethrow_exception(err);
+        }
+        catch (std::runtime_error& ex)
+        {
+            err_msg = ex.what();
+        }
+    });
 
-        pool.run();
+    pool.run();
 
-        CHECK_EQUAL("A Void Problem", err_msg);
-    }
+    EXPECT_EQ("A Void Problem", err_msg);
+}
 
-    TEST(idle)
-    {
-        unsigned int result = 0;
-        auto stid = std::thread::id{};
+TEST(control_flow, idle)
+{
+    unsigned int result = 0;
+    auto stid = std::thread::id{};
 
-        auto pool = c9y::task_pool{};
+    auto pool = c9y::task_pool{};
 
-        auto handle = c9y::start_idle(pool, [&] () {
-            stid = std::this_thread::get_id();
-            result++;
-            return (result < 5);
-        });
+    auto handle = c9y::start_idle(pool, [&] () {
+        stid = std::this_thread::get_id();
+        result++;
+        return (result < 5);
+    });
 
-        pool.run();
-        CHECK(std::this_thread::get_id() == stid);
-        CHECK_EQUAL(5, result);
-    }
+    pool.run();
+    EXPECT_TRUE(std::this_thread::get_id() == stid);
+    EXPECT_EQ(5, result);
+}
 
-    TEST(timer)
-    {
-        auto result = 0u;
-        auto start = 0u;
-        auto end = 0u;
-        auto stid = std::thread::id{};
+TEST(control_flow, timer)
+{
+    auto result = 0u;
+    auto start = 0u;
+    auto end = 0u;
+    auto stid = std::thread::id{};
 
-        auto pool = c9y::task_pool{};
+    auto pool = c9y::task_pool{};
 
-        c9y::start_timer(pool, [&]() {
-            stid = std::this_thread::get_id();
-            result++;
-            return (result < 5);
-        }, 15);
+    c9y::start_timer(pool, [&]() {
+        stid = std::this_thread::get_id();
+        result++;
+        return (result < 5);
+    }, 15);
 
-        start = c9y::get_ms_time();
-        pool.run();
-        end = c9y::get_ms_time();
+    start = c9y::get_ms_time();
+    pool.run();
+    end = c9y::get_ms_time();
 
-        unsigned int diff = end - start;
+    unsigned int diff = end - start;
 
-        CHECK_EQUAL(5, result);
-        CHECK(74 < diff);
-        CHECK(std::this_thread::get_id() == stid);
-    }
+    EXPECT_EQ(5, result);
+    EXPECT_TRUE(74 < diff);
+    EXPECT_TRUE(std::this_thread::get_id() == stid);
+}
 
-    TEST(async_and_idle)
-    {
-        auto done = false;
-        auto pool = c9y::task_pool{};
+TEST(control_flow, async_and_idle)
+{
+    auto done = false;
+    auto pool = c9y::task_pool{};
 
-        auto ih = c9y::start_idle(pool, [&] () {
-            // something stupid
-            return true;
-        });
+    auto ih = c9y::start_idle(pool, [&] () {
+        // something stupid
+        return true;
+    });
 
-        c9y::async(pool, [&]() {
-            // nothing
-        }, [&](std::exception_ptr err) {
-            c9y::stop_idle(ih);
-            done = true;
-        });
+    c9y::async(pool, [&]() {
+        // nothing
+    }, [&](std::exception_ptr err) {
+        c9y::stop_idle(ih);
+        done = true;
+    });
 
-        pool.run();
+    pool.run();
 
-        CHECK(done);
-    }
+    EXPECT_TRUE(done);
 }

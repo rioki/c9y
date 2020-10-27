@@ -95,10 +95,11 @@
       <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
-      <Command>$(TargetPath)</Command>
+      <Command>echo 1 &gt; $(TargetPath).is_google_test</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Running Unit Tests</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -111,10 +112,11 @@
       <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
-      <Command>$(TargetPath)</Command>
+      <Command>echo 1 &gt; $(TargetPath).is_google_test</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Running Unit Tests</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -133,10 +135,11 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>$(TargetPath)</Command>
+      <Command>echo 1 &gt; $(TargetPath).is_google_test</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Running Unit Tests</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -155,10 +158,11 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>$(TargetPath)</Command>
+      <Command>echo 1 &gt; $(TargetPath).is_google_test</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Running Unit Tests</Message>
+      <Message>
+      </Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -166,12 +170,8 @@
     <ClCompile Include="control_flow_test.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="queue_test.cpp" />
-    <ClCompile Include="rtest.cpp" />
     <ClCompile Include="task_pool_test.cpp" />
     <ClCompile Include="thread_pool_test.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="rtest.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\c9y\c9y.vcxproj">

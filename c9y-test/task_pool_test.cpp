@@ -27,104 +27,101 @@
 
 #include <c9y/c9y.h>
 
-#include "rtest.h"
+#include <gtest/gtest.h>
 
-SUITE(task_pool)
+
+TEST(task_pool, fallthrough)
 {
-    TEST(fallthrough)
-    {
-        auto pool = c9y::task_pool{};
-        pool.run();
+    auto pool = c9y::task_pool{};
+    pool.run();
 
-    }
-
-    TEST(create)
-    {
-        auto count = std::atomic<unsigned int>{0};
-
-        auto task = [&]() {
-            count++;
-        };
-
-        auto pool = c9y::task_pool{2};
-
-        pool.async(task);
-        pool.async(task);
-        pool.async(task);
-        pool.sync(task);
-
-        pool.run();
-
-        CHECK_EQUAL(4, static_cast<unsigned int>(count));
-    }
-
-    TEST(start_fallthrough)
-    {
-        auto pool = c9y::task_pool{};
-        pool.start();
-        pool.run();
-    }
-
-    TEST(run_once)
-    {
-        auto count = std::atomic<unsigned int>{0};
-
-        auto pool = c9y::task_pool{};
-        pool.sync([&] () {
-            count++;
-        });
-        pool.sync([&] () {
-            count++;
-        });
-
-        pool.run_once();
-        pool.run_once();
-        pool.join();
-
-        CHECK_EQUAL(2, static_cast<unsigned int>(count));
-    }
-
-    TEST(run_once_leave_work_in_queue)
-    {
-        auto count = std::atomic<unsigned int>{0};
-
-        auto pool = c9y::task_pool{};
-        pool.sync([&] () {
-            count++;
-        });
-        pool.sync([&] () {
-            count++;
-        });
-
-        pool.run_once();
-        pool.join();
-
-        CHECK_EQUAL(1, static_cast<unsigned int>(count));
-    }
-
-    TEST(start_join_no_run)
-    {
-        auto pool = c9y::task_pool{};
-        pool.start();
-        pool.join();
-    }
-
-    TEST(start_join_no_run_still_works_async)
-    {
-        auto promise = std::promise<void>();
-
-        auto pool = c9y::task_pool{};
-        pool.start();
-
-        pool.async([&] () {
-            promise.set_value();
-        });
-
-        auto future = promise.get_future();
-        future.wait();
-
-        pool.join();
-
-        //CHECK_EQUAL(0, static_cast<unsigned int>(count));
-    }
 }
+
+TEST(task_pool, create)
+{
+    auto count = std::atomic<unsigned int>{0};
+
+    auto task = [&]() {
+        count++;
+    };
+
+    auto pool = c9y::task_pool{2};
+
+    pool.async(task);
+    pool.async(task);
+    pool.async(task);
+    pool.sync(task);
+
+    pool.run();
+
+    EXPECT_EQ(4, static_cast<unsigned int>(count));
+}
+
+TEST(task_pool, start_fallthrough)
+{
+    auto pool = c9y::task_pool{};
+    pool.start();
+    pool.run();
+}
+
+TEST(task_pool, run_once)
+{
+    auto count = std::atomic<unsigned int>{0};
+
+    auto pool = c9y::task_pool{};
+    pool.sync([&] () {
+        count++;
+    });
+    pool.sync([&] () {
+        count++;
+    });
+
+    pool.run_once();
+    pool.run_once();
+    pool.join();
+
+    EXPECT_EQ(2, static_cast<unsigned int>(count));
+}
+
+TEST(task_pool, run_once_leave_work_in_queue)
+{
+    auto count = std::atomic<unsigned int>{0};
+
+    auto pool = c9y::task_pool{};
+    pool.sync([&] () {
+        count++;
+    });
+    pool.sync([&] () {
+        count++;
+    });
+
+    pool.run_once();
+    pool.join();
+
+    EXPECT_EQ(1, static_cast<unsigned int>(count));
+}
+
+TEST(task_pool, start_join_no_run)
+{
+    auto pool = c9y::task_pool{};
+    pool.start();
+    pool.join();
+}
+
+TEST(task_pool, start_join_no_run_still_works_async)
+{
+    auto promise = std::promise<void>();
+
+    auto pool = c9y::task_pool{};
+    pool.start();
+
+    pool.async([&] () {
+        promise.set_value();
+    });
+
+    auto future = promise.get_future();
+    future.wait();
+
+    pool.join();
+}
+

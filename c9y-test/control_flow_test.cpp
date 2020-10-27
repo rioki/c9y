@@ -182,3 +182,25 @@ TEST(control_flow, async_and_idle)
 
     EXPECT_TRUE(done);
 }
+
+TEST(control_flow, async_and_timer)
+{
+    auto done = false;
+    auto pool = c9y::task_pool{};
+
+    auto th = c9y::start_timer(pool, [&] () {
+        // something stupid
+        return true;
+    }, 5);
+
+    c9y::async(pool, [&]() {
+        // nothing
+    }, [&](std::exception_ptr err) {
+        c9y::stop_timer(th);
+        done = true;
+    });
+
+    pool.run();
+
+    EXPECT_TRUE(done);
+}

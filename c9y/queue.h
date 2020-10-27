@@ -135,6 +135,10 @@ namespace c9y
          * This method will try to pop a value off the queue. If no value is
          * in the queue, it will wait until either a value is pushed onto the
          * queue or wake is called.
+         *
+         * @warning It is quite simple to build a race condition with pop_wait 
+         * and wake. If you intend to reliably wake all waiting threads, use 
+         * pop_wait_for with a reasonable timeout. 
          **/
         bool pop_wait(value_type& value)
         {

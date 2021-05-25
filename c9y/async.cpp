@@ -21,16 +21,53 @@
 // SOFTWARE.
 //
 
-#ifndef _C9Y_H_
-#define _C9Y_H_
+#include "async.h"
 
-#include "defines.h"
 #include "thread_pool.h"
 #include "queue.h"
-#include "task_pool.h"
-#include "sync.h"
-#include "async.h"
-#include "ctrlflow.h"
-#include "algorithm.h"
 
-#endif
+using namespace std::literals::chrono_literals;
+
+namespace c9y
+{
+    class AsyncWorker
+    {
+    public:
+        AsyncWorker() noexcept = default;
+
+        ~AsyncWorker()
+        {
+            running = false;
+            task_queue.wake();
+            pool.join();
+        }
+
+        void shedule(const std::function<void()>& func) noexcept
+        {
+            task_queue.push(func);
+        }
+
+    private:
+        std::atomic<bool>            running    = true;
+        queue<std::function<void()>> task_queue;
+        thread_pool                  pool       = thread_pool([this] () {thread_func();}, std::thread::hardware_concurrency());
+
+        void thread_func()
+        {
+            std::function<void()> task;
+            while (running)
+            {
+                if (task_queue.pop_wait_for(task, 100ms))
+                {
+                    task();
+                }
+            }
+        }
+    };
+    AsyncWorker worker;
+
+    void async(const std::function<void()>& func) noexcept
+    {
+        worker.shedule(func);
+    }
+}

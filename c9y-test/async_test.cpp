@@ -21,16 +21,28 @@
 // SOFTWARE.
 //
 
-#ifndef _C9Y_H_
-#define _C9Y_H_
+#include <future>
 
-#include "defines.h"
-#include "thread_pool.h"
-#include "queue.h"
-#include "task_pool.h"
-#include "sync.h"
-#include "async.h"
-#include "ctrlflow.h"
-#include "algorithm.h"
+#include <c9y/c9y.h>
+#include <gtest/gtest.h>
 
-#endif
+TEST(async, launch)
+{
+    std::promise<std::thread::id> p;
+    c9y::async([&] () {
+        p.set_value(std::this_thread::get_id());
+    });
+
+    auto id = p.get_future().get();
+    EXPECT_NE(std::this_thread::get_id(), id);
+}
+
+TEST(async, launch_with_future)
+{
+    auto f = c9y::async<std::thread::id>([&] () {
+        return std::this_thread::get_id();
+    });
+
+    auto id = f.get();
+    EXPECT_NE(std::this_thread::get_id(), id);
+}

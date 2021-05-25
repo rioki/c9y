@@ -155,6 +155,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="algorithm.h" />
+    <ClInclude Include="async.h" />
     <ClInclude Include="c9y.h" />
     <ClInclude Include="ctrlflow.h" />
     <ClInclude Include="defines.h" />
@@ -165,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="algorithm.cpp" />
+    <ClCompile Include="async.cpp" />
     <ClCompile Include="ctrlflow.cpp" />
     <ClCompile Include="sync.cpp" />
     <ClCompile Include="task_pool.cpp" />

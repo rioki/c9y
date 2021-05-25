@@ -28,6 +28,7 @@
 #include "thread_pool.h"
 #include "queue.h"
 #include "task_pool.h"
+#include "sync.h"
 #include "ctrlflow.h"
 #include "algorithm.h"
 

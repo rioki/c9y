@@ -46,3 +46,13 @@ TEST(async, launch_with_future)
     auto id = f.get();
     EXPECT_NE(std::this_thread::get_id(), id);
 }
+
+TEST(async, exception_captured_by_future)
+{
+    auto throwing_func = [] () -> int {
+        throw std::runtime_error("Boom!");
+    };
+
+    auto f = c9y::async<int>(throwing_func);
+    EXPECT_THROW(f.get(), std::runtime_error);
+}

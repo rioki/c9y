@@ -102,5 +102,8 @@ namespace c9y
     };
 }
 
+class thread_pool
+{};
+
 #endif
 

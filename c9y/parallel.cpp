@@ -1,6 +1,6 @@
 //
 // c9y - concurrency
-// Copyright(c) 2017-2019 Sean Farrell
+// Copyright(c) 2017-2021 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -21,44 +21,17 @@
 // SOFTWARE.
 //
 
-#include "algorithm.h"
+#include "parallel.h"
 
-#include <cassert>
+#include "task_pool.h"
 
 namespace c9y
 {
-    void _sequence_one(task_pool& tp, std::shared_ptr<std::list<std::function<void ()>>> shared_tasks, std::function<void(std::exception_ptr err)> callback)
+    task_pool& _get_parallel_pool() noexcept
     {
-        assert(shared_tasks);
-        assert(!shared_tasks->empty());
-
-        auto task = shared_tasks->front();
-        assert(task);
-        try
-        {
-            task();
-        }
-        catch (...)
-        {
-            auto err = std::current_exception();
-            tp.sync([callback, err] () {
-                callback(err);
-            });
-            return;
-        }
-
-        shared_tasks->pop_front();
-        if (shared_tasks->empty())
-        {
-            tp.sync([callback] () {
-                callback(std::exception_ptr{});
-            });
-        }
-        else
-        {
-            tp.async([&tp, shared_tasks, callback] () {
-                _sequence_one(tp, shared_tasks, callback);
-            });
-        }
+        static task_pool pool(std::thread::hardware_concurrency());
+        return pool;
     }
+
+
 }

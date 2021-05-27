@@ -21,50 +21,26 @@
 // SOFTWARE.
 //
 
-#include "task_pool.h"
+#include <c9y/latch.h>
 
-#include <iostream>
+#include <atomic>
+#include <gtest/gtest.h>
 
-using namespace std::literals::chrono_literals;
+#include <c9y/async.h>
 
-namespace c9y
+TEST(latch, wait)
 {
-    task_pool::task_pool(size_t concurency) noexcept
-    : pool([this] () {thread_func();}, concurency) {}
+    auto my_latch = c9y::latch{12u};
+    auto count    = std::atomic<unsigned int>{0u};
 
-    task_pool::~task_pool()
+    for (auto i = 0u; i < 12; i++)
     {
-        running = false;
-        tasks.wake();
-        pool.join();
+        c9y::async([&] () {
+            my_latch.count_down();
+            count++;
+        });
     }
 
-    void task_pool::enqueue(const std::function<void ()>& func) noexcept
-    {
-        tasks.push(func);
-    }
-
-    void task_pool::thread_func() noexcept
-    {
-        std::function<void()> task;
-        while (running)
-        {
-            if (tasks.pop_wait_for(task, 100ms))
-            {
-                try
-                {
-                    task();
-                }
-                catch (const std::exception& ex)
-                {
-                    std::cerr << ex.what() << std::endl;
-                    std::terminate();
-                }
-                catch (...)
-                {
-                    std::terminate();
-                }
-            }
-        }
-    }
+    my_latch.wait();
+    EXPECT_EQ(12u, count);
 }

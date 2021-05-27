@@ -1,6 +1,6 @@
 //
 // c9y - concurrency
-// Copyright(c) 2017-2019 Sean Farrell
+// Copyright(c) 2017-2021 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -24,9 +24,9 @@
 #ifndef _C9Y_TASK_POOL_H_
 #define _C9Y_TASK_POOL_H_
 
-#include <mutex>
-#include <condition_variable>
-#include <atomic>
+#include <functional>
+#include <thread>
+#include <vector>
 
 #include "defines.h"
 #include "thread_pool.h"
@@ -34,105 +34,35 @@
 
 namespace c9y
 {
-    /**
-     * Task Pool
-     *
-     * A task pool is a wrapper around a thread pool that allow heterogenous task execution.
-     *
-     * There are two streams of execution, one asyncrounous and one syncronous.
-     * The so called asnycronous stream is executed on the thread pool. The
-     * syncronous stream is executed on the main thread. This allows to build
-     * execution patterns where something is done on the thread pool and once
-     * compleated synced back with the global state in the main thread, without
-     * aditionall locking.
-     *
-     * @see async
-     **/
+    //! Task Pool
+    //!
+    //! A task pool is a pool of threads that are executing heterogeneous tasks.
     class C9Y_EXPORT task_pool
     {
     public:
-        /**
-         * Construct a task pool.
-         *
-         * @param concurency the number of thread to create
-         **/
-        task_pool(size_t concurency = std::thread::hardware_concurrency());
+        //! Construct task pool with given concurrency.
+        //!
+        //! @param concurency the number of threads spawn.
+        explicit task_pool(size_t concurency) noexcept;
 
-        task_pool(const task_pool&) = delete;
+        task_pool(const thread_pool&) = delete;
 
-        /**
-         * Destructor
-         **/
+        //! Destructor
         ~task_pool();
 
         task_pool& operator = (const task_pool&) = delete;
 
-        /**
-         * Schedule task in the asyncronous execution stream.
-         **/
-        void async(std::function<void ()> task);
-
-        /**
-         * Schedule task in the syncronous execution stream.
-         **/
-        void sync(std::function<void()> task);
-
-        /**
-         * Execute all pending tasks.
-         *
-         * This method will run until there are no tasks to execute.
-         * Tasks can shedule further tasks, which are then executed in turn.
-         *
-         * @warning run, run_once and start need to be called from the same thread.
-         **/
-        void run();
-
-        /**
-         * Execute one sync task.
-         *
-         * This method will execute exactly one task from the syncronous stream.
-         * When integrating in windowing systems and similar execution enviroments
-         * the taks pool's main thread may be needed for other task and
-         * sync tasks should only be done 'on idle'.
-         *
-         * @warning run, run_once and start need to be called from the same thread.
-         *
-         * @warnign If only run_once is used, the task pool must be joined
-         * before it is being desroyed.
-         **/
-        void run_once();
-
-        /**
-         * Start asyncronous execution of tasks.
-         *
-         * This method will asyncronous execution of stats. It may be advantages
-         * to start the task execution of the asyncronous stream before comitting
-         * the main thread. For example for the use of the algorithms or
-         * just starting to work on tasks while still setting things up.
-         *
-         * @warning run, run_once and start need to be called from the same thread.
-         **/
-        void start();
-
-        /**
-         * Join the task pool
-         *
-         * This method will join the underling thread pool. This is nessesary
-         * if run was never called.
-         **/
-        void join();
+        //! Add a task to the work queue.
+        void enqueue(const std::function<void ()>& func) noexcept;
 
     private:
-        size_t                       concurency;
-        std::atomic<unsigned int>    ref_count;
+        std::atomic<bool>             running = true;
+        queue<std::function<void ()>> tasks;
+        thread_pool                   pool;
 
-        queue<std::function<void()>> atasks;
-        queue<std::function<void()>> stasks;
-
-        thread_pool                  pool;
-
-        void execute();
+        void thread_func() noexcept;
     };
 }
 
 #endif
+

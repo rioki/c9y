@@ -21,50 +21,40 @@
 // SOFTWARE.
 //
 
-#include "task_pool.h"
-
-#include <iostream>
-
-using namespace std::literals::chrono_literals;
+#include "latch.h"
 
 namespace c9y
 {
-    task_pool::task_pool(size_t concurency) noexcept
-    : pool([this] () {thread_func();}, concurency) {}
-
-    task_pool::~task_pool()
+    std::ptrdiff_t latch::max() noexcept
     {
-        running = false;
-        tasks.wake();
-        pool.join();
+        return std::numeric_limits<std::ptrdiff_t>::max();
     }
 
-    void task_pool::enqueue(const std::function<void ()>& func) noexcept
-    {
-        tasks.push(func);
-    }
+    latch::latch(std::ptrdiff_t expected)
+    : count(expected) {}
 
-    void task_pool::thread_func() noexcept
+    void latch::count_down(std::ptrdiff_t n)
     {
-        std::function<void()> task;
-        while (running)
+        auto lock = std::unique_lock<std::mutex>{mutex};
+        count -= n;
+        if (count <= 0)
         {
-            if (tasks.pop_wait_for(task, 100ms))
-            {
-                try
-                {
-                    task();
-                }
-                catch (const std::exception& ex)
-                {
-                    std::cerr << ex.what() << std::endl;
-                    std::terminate();
-                }
-                catch (...)
-                {
-                    std::terminate();
-                }
-            }
+            cond.notify_all();
+        }
+    }
+
+    bool latch::try_wait() const noexcept
+    {
+        wait();
+        return true;
+    }
+
+    void latch::wait() const
+    {
+        auto lock = std::unique_lock<std::mutex>{mutex};
+        if (count > 0)
+        {
+            cond.wait(lock);
         }
     }
 }

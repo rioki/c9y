@@ -15,39 +15,48 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="c9y.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ctrlflow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="queue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="task_pool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="thread_pool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="algorithm.h">
+    <ClInclude Include="sync.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="async.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="latch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="task_pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ctrlflow.cpp">
+    <ClCompile Include="thread_pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sync.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="async.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="latch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="task_pool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="thread_pool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="algorithm.cpp">
+    <ClCompile Include="parallel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

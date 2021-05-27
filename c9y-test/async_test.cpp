@@ -21,24 +21,38 @@
 // SOFTWARE.
 //
 
-#ifndef _C9Y_DEFINES_H_
-#define _C9Y_DEFINES_H_
+#include <c9y/async.h>
 
-#define C9Y_VERSION "0.4.0"
+#include <future>
+#include <gtest/gtest.h>
 
-#if defined(_WIN32)
-#define C9Y_EXPORT __declspec(dllexport)
-#else
-#define C9Y_EXPORT
-#endif
+TEST(async, launch)
+{
+    std::promise<std::thread::id> p;
+    c9y::async([&] () {
+        p.set_value(std::this_thread::get_id());
+    });
 
-// disable silly warnings
-#ifndef _MSVC
-#pragma warning(disable: 4251)
-#endif
+    auto id = p.get_future().get();
+    EXPECT_NE(std::this_thread::get_id(), id);
+}
 
-#if _WIN32 | _WIN64 | __CYGWIN__
-#define WINDOWS
-#endif
+TEST(async, launch_with_future)
+{
+    auto f = c9y::async<std::thread::id>([&] () {
+        return std::this_thread::get_id();
+    });
 
-#endif
+    auto id = f.get();
+    EXPECT_NE(std::this_thread::get_id(), id);
+}
+
+TEST(async, exception_captured_by_future)
+{
+    auto throwing_func = [] () -> int {
+        throw std::runtime_error("Boom!");
+    };
+
+    auto f = c9y::async<int>(throwing_func);
+    EXPECT_THROW(f.get(), std::runtime_error);
+}

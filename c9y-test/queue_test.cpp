@@ -1,6 +1,6 @@
 //
 // c9y - concurrency
-// Copyright(c) 2017-2019 Sean Farrell
+// Copyright(c) 2017-2021 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -21,12 +21,13 @@
 // SOFTWARE.
 //
 
+#include <c9y/queue.h>
+
 #include <atomic>
 #include <thread>
 
-#include <c9y/c9y.h>
-
 #include <gtest/gtest.h>
+#include <c9y/thread_pool.h>
 
 using namespace std::chrono_literals;
 

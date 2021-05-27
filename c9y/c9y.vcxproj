@@ -154,17 +154,20 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="algorithm.h" />
-    <ClInclude Include="c9y.h" />
-    <ClInclude Include="ctrlflow.h" />
+    <ClInclude Include="async.h" />
     <ClInclude Include="defines.h" />
+    <ClInclude Include="latch.h" />
+    <ClInclude Include="parallel.h" />
     <ClInclude Include="queue.h" />
+    <ClInclude Include="sync.h" />
     <ClInclude Include="task_pool.h" />
     <ClInclude Include="thread_pool.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="algorithm.cpp" />
-    <ClCompile Include="ctrlflow.cpp" />
+    <ClCompile Include="async.cpp" />
+    <ClCompile Include="latch.cpp" />
+    <ClCompile Include="parallel.cpp" />
+    <ClCompile Include="sync.cpp" />
     <ClCompile Include="task_pool.cpp" />
     <ClCompile Include="thread_pool.cpp" />
   </ItemGroup>

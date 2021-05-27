@@ -21,24 +21,17 @@
 // SOFTWARE.
 //
 
-#ifndef _C9Y_DEFINES_H_
-#define _C9Y_DEFINES_H_
+#include "async.h"
 
-#define C9Y_VERSION "0.4.0"
+#include "task_pool.h"
 
-#if defined(_WIN32)
-#define C9Y_EXPORT __declspec(dllexport)
-#else
-#define C9Y_EXPORT
-#endif
+using namespace std::literals::chrono_literals;
 
-// disable silly warnings
-#ifndef _MSVC
-#pragma warning(disable: 4251)
-#endif
-
-#if _WIN32 | _WIN64 | __CYGWIN__
-#define WINDOWS
-#endif
-
-#endif
+namespace c9y
+{
+    void async(const std::function<void()>& func) noexcept
+    {
+        static task_pool pool(std::thread::hardware_concurrency());
+        pool.enqueue(func);
+    }
+}

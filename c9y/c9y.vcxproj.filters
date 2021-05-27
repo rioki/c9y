@@ -36,7 +36,7 @@
     <ClInclude Include="task_pool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="paralell.h">
+    <ClInclude Include="parallel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -56,7 +56,7 @@
     <ClCompile Include="task_pool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="paralell.cpp">
+    <ClCompile Include="parallel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -21,41 +21,17 @@
 // SOFTWARE.
 //
 
-#ifndef _C9Y_PARALELL_H_
-#define _C9Y_PARALELL_H_
+#include "parallel.h"
 
-#include "defines.h"
-
-#include <functional>
-#include <vector>
-
-#include "latch.h"
 #include "task_pool.h"
 
 namespace c9y
 {
-    C9Y_EXPORT task_pool& _get_paralell_pool() noexcept;
-
-    template <typename IteratorT>
-    void paralell(IteratorT begin, IteratorT end) noexcept
+    task_pool& _get_parallel_pool() noexcept
     {
-        auto& pool = _get_paralell_pool();
-        latch l(std::distance(begin, end));
-        for (auto i = begin; i != end; ++i)
-        {
-            auto task = *i;
-            pool.enqueue([&, task] () {
-                task();
-                l.count_down();
-            });
-        }
-        l.wait();
+        static task_pool pool(std::thread::hardware_concurrency());
+        return pool;
     }
 
-    inline void paralell(const std::vector<std::function<void ()>>& tasks) noexcept
-    {
-        paralell(begin(tasks), end(tasks));
-    }
+
 }
-
-#endif

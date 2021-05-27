@@ -21,9 +21,9 @@
 // SOFTWARE.
 //
 
-#include <future>
+#include <c9y/async.h>
 
-#include <c9y/c9y.h>
+#include <future>
 #include <gtest/gtest.h>
 
 TEST(async, launch)

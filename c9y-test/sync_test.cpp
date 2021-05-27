@@ -21,7 +21,8 @@
 // SOFTWARE.
 //
 
-#include <c9y/c9y.h>
+#include <c9y/sync.h>
+
 #include <gtest/gtest.h>
 
 using namespace std::literals::chrono_literals;

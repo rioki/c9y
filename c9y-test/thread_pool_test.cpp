@@ -21,10 +21,9 @@
 // SOFTWARE.
 //
 
+#include <c9y/thread_pool.h>
+
 #include <atomic>
-
-#include <c9y/c9y.h>
-
 #include <gtest/gtest.h>
 
 TEST(thread_pool, create)

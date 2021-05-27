@@ -21,12 +21,13 @@
 // SOFTWARE.
 //
 
+#include <c9y/queue.h>
+
 #include <atomic>
 #include <thread>
 
-#include <c9y/c9y.h>
-
 #include <gtest/gtest.h>
+#include <c9y/thread_pool.h>
 
 using namespace std::chrono_literals;
 

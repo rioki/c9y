@@ -172,13 +172,10 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="algorithm_test.cpp" />
     <ClCompile Include="async_test.cpp" />
-    <ClCompile Include="control_flow_test.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="queue_test.cpp" />
     <ClCompile Include="sync_test.cpp" />
-    <ClCompile Include="task_pool_test.cpp" />
     <ClCompile Include="thread_pool_test.cpp" />
   </ItemGroup>
   <ItemGroup>

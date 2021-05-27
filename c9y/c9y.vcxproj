@@ -157,6 +157,7 @@
     <ClInclude Include="async.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="latch.h" />
+    <ClInclude Include="paralell.h" />
     <ClInclude Include="queue.h" />
     <ClInclude Include="sync.h" />
     <ClInclude Include="task_pool.h" />
@@ -165,6 +166,7 @@
   <ItemGroup>
     <ClCompile Include="async.cpp" />
     <ClCompile Include="latch.cpp" />
+    <ClCompile Include="paralell.cpp" />
     <ClCompile Include="sync.cpp" />
     <ClCompile Include="task_pool.cpp" />
     <ClCompile Include="thread_pool.cpp" />

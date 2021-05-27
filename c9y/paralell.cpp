@@ -21,50 +21,17 @@
 // SOFTWARE.
 //
 
+#include "paralell.h"
+
 #include "task_pool.h"
-
-#include <iostream>
-
-using namespace std::literals::chrono_literals;
 
 namespace c9y
 {
-    task_pool::task_pool(size_t concurency) noexcept
-    : pool([this] () {thread_func();}, concurency) {}
-
-    task_pool::~task_pool()
+    task_pool& _get_paralell_pool() noexcept
     {
-        running = false;
-        tasks.wake();
-        pool.join();
+        static task_pool pool(std::thread::hardware_concurrency());
+        return pool;
     }
 
-    void task_pool::enqueue(const std::function<void ()>& func) noexcept
-    {
-        tasks.push(func);
-    }
 
-    void task_pool::thread_func() noexcept
-    {
-        std::function<void()> task;
-        while (running)
-        {
-            if (tasks.pop_wait_for(task, 100ms))
-            {
-                try
-                {
-                    task();
-                }
-                catch (const std::exception& ex)
-                {
-                    std::cerr << ex.what() << std::endl;
-                    std::terminate();
-                }
-                catch (...)
-                {
-                    std::terminate();
-                }
-            }
-        }
-    }
 }

@@ -21,50 +21,41 @@
 // SOFTWARE.
 //
 
+#ifndef _C9Y_PARALELL_H_
+#define _C9Y_PARALELL_H_
+
+#include "defines.h"
+
+#include <functional>
+#include <vector>
+
+#include "latch.h"
 #include "task_pool.h"
-
-#include <iostream>
-
-using namespace std::literals::chrono_literals;
 
 namespace c9y
 {
-    task_pool::task_pool(size_t concurency) noexcept
-    : pool([this] () {thread_func();}, concurency) {}
+    C9Y_EXPORT task_pool& _get_paralell_pool() noexcept;
 
-    task_pool::~task_pool()
+    template <typename IteratorT>
+    void paralell(IteratorT begin, IteratorT end) noexcept
     {
-        running = false;
-        tasks.wake();
-        pool.join();
-    }
-
-    void task_pool::enqueue(const std::function<void ()>& func) noexcept
-    {
-        tasks.push(func);
-    }
-
-    void task_pool::thread_func() noexcept
-    {
-        std::function<void()> task;
-        while (running)
+        auto& pool = _get_paralell_pool();
+        latch l(std::distance(begin, end));
+        for (auto i = begin; i != end; ++i)
         {
-            if (tasks.pop_wait_for(task, 100ms))
-            {
-                try
-                {
-                    task();
-                }
-                catch (const std::exception& ex)
-                {
-                    std::cerr << ex.what() << std::endl;
-                    std::terminate();
-                }
-                catch (...)
-                {
-                    std::terminate();
-                }
-            }
+            auto task = *i;
+            pool.enqueue([&, task] () {
+                task();
+                l.count_down();
+            });
         }
+        l.wait();
+    }
+
+    inline void paralell(const std::vector<std::function<void ()>>& tasks) noexcept
+    {
+        paralell(begin(tasks), end(tasks));
     }
 }
+
+#endif

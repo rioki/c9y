@@ -43,24 +43,24 @@ namespace c9y
         //! Construct task pool with given concurrency.
         //!
         //! @param concurency the number of threads spawn.
-        explicit task_pool(size_t concurency);
+        explicit task_pool(size_t concurency) noexcept;
 
         task_pool(const thread_pool&) = delete;
 
         //! Destructor
         ~task_pool();
 
-        thread_pool& operator = (const thread_pool&) = delete;
+        task_pool& operator = (const task_pool&) = delete;
 
         //! Add a task to the work queue.
-        void enqueue(const std::function<void ()>& func);
+        void enqueue(const std::function<void ()>& func) noexcept;
 
     private:
         std::atomic<bool>             running = true;
-        thread_pool                   pool;
         queue<std::function<void ()>> tasks;
+        thread_pool                   pool;
 
-        void thread_func();
+        void thread_func() noexcept;
     };
 }
 

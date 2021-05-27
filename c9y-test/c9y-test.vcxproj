@@ -175,6 +175,7 @@
     <ClCompile Include="async_test.cpp" />
     <ClCompile Include="latch_test.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="paralell_test.cpp" />
     <ClCompile Include="queue_test.cpp" />
     <ClCompile Include="sync_test.cpp" />
     <ClCompile Include="thread_pool_test.cpp" />

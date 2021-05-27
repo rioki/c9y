@@ -21,50 +21,50 @@
 // SOFTWARE.
 //
 
-#include "task_pool.h"
+#include <c9y/paralell.h>
 
-#include <iostream>
+#include <atomic>
+#include <array>
+#include <gtest/gtest.h>
 
-using namespace std::literals::chrono_literals;
-
-namespace c9y
+TEST(paralell, paralell_container)
 {
-    task_pool::task_pool(size_t concurency) noexcept
-    : pool([this] () {thread_func();}, concurency) {}
+    auto count = std::atomic<unsigned int>{0};
+    auto coutner = std::array<std::function<void()>, 4>{
+        [&]() {
+            count += 1;
+        },
+        [&]() {
+            count += 3;
+        },
+        [&]() {
+            count += 3;
+        },
+        [&]() {
+            count += 7;
+        },
+    };
 
-    task_pool::~task_pool()
-    {
-        running = false;
-        tasks.wake();
-        pool.join();
-    }
+    c9y::paralell(begin(coutner), end(coutner));
+    EXPECT_EQ(14, static_cast<unsigned int>(count));
+}
 
-    void task_pool::enqueue(const std::function<void ()>& func) noexcept
-    {
-        tasks.push(func);
-    }
-
-    void task_pool::thread_func() noexcept
-    {
-        std::function<void()> task;
-        while (running)
-        {
-            if (tasks.pop_wait_for(task, 100ms))
-            {
-                try
-                {
-                    task();
-                }
-                catch (const std::exception& ex)
-                {
-                    std::cerr << ex.what() << std::endl;
-                    std::terminate();
-                }
-                catch (...)
-                {
-                    std::terminate();
-                }
-            }
-        }
-    }
+TEST(paralell, paralell_inplace)
+{
+    auto count = std::atomic<unsigned int>{0};
+    c9y::paralell({
+        [&]() {
+            count += 1;
+        },
+        [&]() {
+            count += 3;
+        },
+        [&]() {
+            count += 3;
+        },
+        [&]() {
+            count += 7;
+        },
+    });
+    EXPECT_EQ(14, static_cast<unsigned int>(count));
 }

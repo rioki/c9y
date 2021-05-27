@@ -30,6 +30,9 @@
     <ClInclude Include="async.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="latch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="thread_pool.cpp">
@@ -39,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="async.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="latch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

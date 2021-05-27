@@ -173,6 +173,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="async_test.cpp" />
+    <ClCompile Include="latch_test.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="queue_test.cpp" />
     <ClCompile Include="sync_test.cpp" />

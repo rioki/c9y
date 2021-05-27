@@ -30,5 +30,8 @@
     <ClCompile Include="async_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="latch_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

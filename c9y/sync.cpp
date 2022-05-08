@@ -1,6 +1,6 @@
 //
 // c9y - concurrency
-// Copyright(c) 2017-2021 Sean Farrell
+// Copyright 2017-2022 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -49,10 +49,22 @@ namespace c9y
         sync(std::this_thread::get_id(), func);
     }
 
+    void delay(once_tag& tag, const std::function<void()>& func) noexcept
+    {
+        sync(tag, std::this_thread::get_id(), func);
+    }
+
     void sync(const std::function<void()>& func) noexcept
     {
         assert(main_thread_id != std::thread::id());
         sync(main_thread_id, func);
+    }
+
+    void sync(once_tag& tag, const std::function<void()>& func) noexcept
+    {
+        assert(func);
+        assert(main_thread_id != std::thread::id());
+        sync(tag, main_thread_id, func);
     }
 
     void sync(const std::thread::id& thread, const std::function<void()>& func) noexcept
@@ -60,6 +72,18 @@ namespace c9y
         assert(func);
         std::scoped_lock<std::mutex> sl(tasks_mutex);
         tasks[thread].push_back(func);
+    }
+
+    void sync(once_tag& tag, const std::thread::id& thread, const std::function<void()>& func) noexcept
+    {
+        assert(func);
+        if (tag.active.exchange(true) == false)
+        {
+            sync(thread, [&tag, func]() {
+                tag.active = false;
+                func();
+            });
+        }
     }
 
     std::vector<std::function<void()>> get_this_threads_tasks() noexcept

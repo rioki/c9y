@@ -1,0 +1,8 @@
+{
+  "name": "glm",
+  "version": "0.3.0",
+  "builtin-baseline": "43e35945783d078d1216927b85447b2eba34a7cc",
+  "dependencies": [
+      "gtest"
+  ]
+}

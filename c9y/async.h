@@ -1,6 +1,6 @@
 //
 // c9y - concurrency
-// Copyright(c) 2017-2021 Sean Farrell
+// Copyright 2017-2022 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -32,12 +32,12 @@
 namespace c9y
 {
     //! Queue action to be executed on the shared thread pool.
-    //! 
+    //!
     //! @param func the function to execute.
     C9Y_EXPORT void async(const std::function<void ()>& func) noexcept;
 
     //! Queue action to be executed on the shared thread pool with result
-    //! 
+    //!
     //! @param func the function to execute.
     template <typename T>
     std::future<T> async(const std::function<T ()>& func) noexcept

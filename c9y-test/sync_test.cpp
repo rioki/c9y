@@ -1,6 +1,6 @@
 //
 // c9y - concurrency
-// Copyright(c) 2017-2021 Sean Farrell
+// Copyright 2017-2022 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -114,6 +114,7 @@ TEST(sync, sync_different_thread_with_result)
     EXPECT_EQ(id_a, exec_id);
     EXPECT_EQ(42, result);
 }
+
 TEST(sync, sync_main_thread_with_result)
 {
     std::thread::id exec_id;
@@ -155,6 +156,37 @@ TEST(sync, delay)
     }
 
     EXPECT_EQ(42, result);
+}
+
+TEST(sync, delay_once)
+{
+    auto ot    = c9y::once_tag{};
+    auto count = 0u;
+
+    c9y::delay(ot, [&] () {
+        count++;
+    });
+    c9y::delay(ot, [&] () {
+        count++;
+    });
+
+    EXPECT_EQ(0u, count);
+    c9y::sync_point();
+    EXPECT_EQ(1u, count);
+
+    c9y::delay(ot, [&] () {
+        count++;
+    });
+    c9y::delay(ot, [&] () {
+        count++;
+    });
+    c9y::delay(ot, [&] () {
+        count++;
+    });
+
+    EXPECT_EQ(1u, count);
+    c9y::sync_point();
+    EXPECT_EQ(2u, count);
 }
 
 // NOTE: Don't get smart, death tests don't work over thread boundaries.

@@ -1,6 +1,6 @@
 //
 // c9y - concurrency
-// Copyright(c) 2017-2021 Sean Farrell
+// Copyright 2017-2022 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -34,6 +34,12 @@
 
 namespace c9y
 {
+    //! Tag used to prevent multiple calls to the same feature.
+    struct once_tag
+    {
+        std::atomic<bool> active = false;
+    };
+
     //! Set the main thead id.
     //!
     //! Before using sync without the thread id, you should set the main thread id.
@@ -62,6 +68,19 @@ namespace c9y
     //! @see sync_point
     C9Y_EXPORT void sync(const std::thread::id& thread, const std::function<void ()>& func) noexcept;
 
+    //! Queue action to be exectued by the given thread.
+    //!
+    //! @param tag once_tag used to prevent calls to the same function
+    //! @param thread the thread id of the thread to call on
+    //! @param func the fuction to call in the give thread
+    //!
+    //! @warning If any exception is thrown out of the function
+    //! the sync_point will call terminate. Use sync<T> to get a
+    //! future that can handle the exception.
+    //!
+    //! @see sync_point
+    C9Y_EXPORT void sync(once_tag& tag, const std::thread::id& thread, const std::function<void ()>& func) noexcept;
+
     //! Queue action to be executed by the main thread.
     //!
     //! @func the function to call in the main thread
@@ -73,6 +92,19 @@ namespace c9y
     //! @see set_main_thread_id
     //! @see sync_point
     C9Y_EXPORT void sync(const std::function<void ()>& func) noexcept;
+
+    //! Queue action to be executed by the main thread.
+    //!
+    //! @param tag once_tag used to prevent calls to the same function
+    //! @func the function to call in the main thread
+    //!
+    //! @warning If any exception is thrown out of the function
+    //! the sync_point will call terminate. Use sync<T> to get a
+    //! future that can handle the exception.
+    //!
+    //! @see set_main_thread_id
+    //! @see sync_point
+    C9Y_EXPORT void sync(once_tag& tag, const std::function<void ()>& func) noexcept;
 
     //! Queue action to be exectued by the given thread with result.
     //!
@@ -91,6 +123,24 @@ namespace c9y
         return future;
     }
 
+    //! Queue action to be exectued by the given thread with result.
+    //!
+    //! @param tag once_tag used to prevent calls to the same function
+    //! @param thread the thread id of the thread to call on
+    //! @param func the fuction to call in the give thread
+    //!
+    //! @see sync_point
+    template <typename T>
+    std::future<T> sync(once_tag& tag, const std::thread::id& thread, const std::function<T()>& func) noexcept
+    {
+        auto task = std::make_shared<std::packaged_task<T()>>(func);
+        auto future = task->get_future();
+        sync(tag, thread, [task] () mutable {
+            (*task)();
+        });
+        return future;
+    }
+
     //! Queue task to be executed on the main thread with result.
     //!
     //! @func the function to call in the main thread
@@ -101,6 +151,19 @@ namespace c9y
     std::future<T> sync(const std::function<T()>& func) noexcept
     {
         return sync<T>(get_main_thread_id(), func);
+    }
+
+    //! Queue task to be executed on the main thread with result.
+    //!
+    //! @param tag once_tag used to prevent calls to the same function
+    //! @func the function to call in the main thread
+    //!
+    //! @see set_main_thread_id
+    //! @see sync_point
+    template <typename T>
+    std::future<T> sync(once_tag& tag, const std::function<T()>& func) noexcept
+    {
+        return sync<T>(tag, get_main_thread_id(), func);
     }
 
     //! Delay action until next time tick is called on this thread.
@@ -114,10 +177,55 @@ namespace c9y
     //! @see sync_point
     C9Y_EXPORT void delay(const std::function<void ()>& func) noexcept;
 
+    //! Delay action until next time tick is called on this thread.
+    //!
+    //! @param tag once_tag used to prevent calls to the same function
+    //! @param func the function to call later
+    //!
+    //! @warning If any exception is thrown out of the function
+    //! the sync_point will call terminate. Use sync<T> to get a
+    //! future that can handle the exception.
+    //!
+    //! @see sync_point
+    C9Y_EXPORT void delay(once_tag& tag, const std::function<void ()>& func) noexcept;
+
     //! Execute alle queueed tasks for this thread.
     //!
     //! This function actually calls the tasks queued by sync and delay.
     C9Y_EXPORT void sync_point() noexcept;
+
+    //! Syncronous Function Adapter
+    //!
+    //! To install callbacks that sync on the main thread.
+    //!
+    //! @param that the this pointer to use
+    //! @param method the class method to call.
+    //! @{
+    inline std::function<void ()> sync_fun(const std::function<void ()>& func)
+    {
+        return [func] () {
+            sync(func);
+        };
+    }
+    inline std::function<void ()> sync_fun(const std::thread::id& thread, const std::function<void ()>& func)
+    {
+        return [func] () {
+            sync(func);
+        };
+    }
+    inline std::function<void ()> sync_fun(once_tag& tag, const std::function<void ()>& func)
+    {
+        return [func] () {
+            sync(func);
+        };
+    }
+    inline std::function<void ()> sync_fun(once_tag& tag,  const std::thread::id& thread, const std::function<void ()>& func)
+    {
+        return [func] () {
+            sync(func);
+        };
+    }
+    //! @}
 }
 
 #endif

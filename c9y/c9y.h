@@ -1,6 +1,6 @@
 //
 // c9y - concurrency
-// Copyright 2017-2022 Sean Farrell
+// Copyright(c) 2017-2019 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -21,49 +21,14 @@
 // SOFTWARE.
 //
 
+#ifndef _C9Y_H_
+#define _C9Y_H_
+
+#include "defines.h"
 #include "thread_pool.h"
+#include "queue.h"
+#include "task_pool.h"
+#include "ctrlflow.h"
+#include "algorithm.h"
 
-namespace c9y
-{
-    thread_pool::thread_pool() noexcept {}
-
-    thread_pool::thread_pool(std::function<void()> thread_func, size_t concurency)
-    {
-        for (size_t i = 0; i < concurency; i++)
-        {
-            threads.emplace_back(std::thread(thread_func));
-        }
-    }
-
-    thread_pool::thread_pool(thread_pool&& other) noexcept
-    {
-        swap(other);
-    }
-
-    thread_pool::~thread_pool() {}
-
-    thread_pool& thread_pool::operator = (thread_pool&& other) noexcept
-    {
-        swap(other);
-        return *this;
-    }
-
-    size_t thread_pool::get_concurency() const
-    {
-        return threads.size();
-    }
-
-    void thread_pool::join()
-    {
-        for (auto& thread : threads)
-        {
-            thread.join();
-        }
-        threads.clear();
-    }
-
-    void thread_pool::swap(thread_pool& other) noexcept
-    {
-        threads.swap(other.threads);
-    }
-}
+#endif

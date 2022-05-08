@@ -1,6 +1,5 @@
 .*
-bin
-lib
 x86
 x64
 *.user
+/vcpkg_installed

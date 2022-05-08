@@ -1,6 +1,6 @@
 //
 // c9y - concurrency
-// Copyright 2017-2022 Sean Farrell
+// Copyright(c) 2017-2019 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -21,49 +21,44 @@
 // SOFTWARE.
 //
 
-#include "thread_pool.h"
+#include "algorithm.h"
+
+#include <cassert>
 
 namespace c9y
 {
-    thread_pool::thread_pool() noexcept {}
-
-    thread_pool::thread_pool(std::function<void()> thread_func, size_t concurency)
+    void _sequence_one(task_pool& tp, std::shared_ptr<std::list<std::function<void ()>>> shared_tasks, std::function<void(std::exception_ptr err)> callback)
     {
-        for (size_t i = 0; i < concurency; i++)
+        assert(shared_tasks);
+        assert(!shared_tasks->empty());
+
+        auto task = shared_tasks->front();
+        assert(task);
+        try
         {
-            threads.emplace_back(std::thread(thread_func));
+            task();
         }
-    }
-
-    thread_pool::thread_pool(thread_pool&& other) noexcept
-    {
-        swap(other);
-    }
-
-    thread_pool::~thread_pool() {}
-
-    thread_pool& thread_pool::operator = (thread_pool&& other) noexcept
-    {
-        swap(other);
-        return *this;
-    }
-
-    size_t thread_pool::get_concurency() const
-    {
-        return threads.size();
-    }
-
-    void thread_pool::join()
-    {
-        for (auto& thread : threads)
+        catch (...)
         {
-            thread.join();
+            auto err = std::current_exception();
+            tp.sync([callback, err] () {
+                callback(err);
+            });
+            return;
         }
-        threads.clear();
-    }
 
-    void thread_pool::swap(thread_pool& other) noexcept
-    {
-        threads.swap(other.threads);
+        shared_tasks->pop_front();
+        if (shared_tasks->empty())
+        {
+            tp.sync([callback] () {
+                callback(std::exception_ptr{});
+            });
+        }
+        else
+        {
+            tp.async([&tp, shared_tasks, callback] () {
+                _sequence_one(tp, shared_tasks, callback);
+            });
+        }
     }
 }

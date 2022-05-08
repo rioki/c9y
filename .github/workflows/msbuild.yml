@@ -1,0 +1,43 @@
+name: MSBuild
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Release, Debug]
+        platform: [x86, x64]
+        include:
+          - platform: x86
+            triplet: x86-windows
+          - platform: x64
+            triplet: x64-windows
+    runs-on: windows-latest
+    env:
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+    - name: Restore from cache and install vcpkg
+      uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgGitCommitId: 43e35945783d078d1216927b85447b2eba34a7cc
+    - name: Integrate vcpkg 
+      working-directory: ${{steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT}}
+      run: vcpkg.exe integrate install
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild /m /p:Configuration=${{matrix.configuration}} /property:Platform=${{matrix.platform}} c9y.sln
+    - name: Test
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: ${{matrix.platform}}/${{matrix.configuration}}/c9y-test.exe

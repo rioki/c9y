@@ -39,6 +39,9 @@
     <ClInclude Include="parallel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="c9y.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="thread_pool.cpp">

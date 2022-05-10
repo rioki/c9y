@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="async.h" />
+    <ClInclude Include="c9y.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="latch.h" />
     <ClInclude Include="parallel.h" />

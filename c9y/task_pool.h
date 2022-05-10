@@ -27,6 +27,7 @@
 #include <functional>
 #include <thread>
 #include <vector>
+#include <atomic>
 
 #include "defines.h"
 #include "thread_pool.h"

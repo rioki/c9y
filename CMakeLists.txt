@@ -31,12 +31,10 @@ set(SOURCES_C9Y
   c9y/thread_pool.cpp
 )
 
-
-
 # c9y library
 add_library(c9y ${SOURCES_C9Y})
 set_target_properties(c9y PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     PUBLIC_HEADER "${HEADERS_C9Y}"
 )
 
@@ -60,6 +58,9 @@ if(ENABLE_UNIT_TESTS)
   
   include_directories(.)
   add_executable(c9y-test ${SOURCES_C9Y_TEST})
+  set_target_properties(c9y-test PROPERTIES
+    CXX_STANDARD 20
+  )
   target_link_libraries(c9y-test PRIVATE c9y GTest::gtest)
   add_test(c9y-test c9y-test)
 

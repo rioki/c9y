@@ -25,6 +25,7 @@
 
 #include <stdexcept>
 #include <mutex>
+#include <vector>
 #include <map>
 #include <iostream>
 

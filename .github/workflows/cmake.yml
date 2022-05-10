@@ -1,0 +1,38 @@
+name: MSBuild
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        triplet: [x86-windows, x64-windows, x64-linux]
+        include:
+          - triplet: x86-windows
+            system: windows-latest
+          - triplet: x64-windows
+            system: windows-latest
+          - triplet: x64-linux
+            system: ubuntu-latest
+    runs-on: ${{ matrix.system }}
+    env:
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Restore from cache and install vcpkg
+      uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgGitCommitId: 43e35945783d078d1216927b85447b2eba34a7cc
+    - name: Build
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'ninja-multi-vcpkg'
+          buildPreset: 'ninja-multi-vcpkg'

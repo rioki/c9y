@@ -21,8 +21,8 @@
 // SOFTWARE.
 //
 
-#ifndef _C9Y_parallel_H_
-#define _C9Y_parallel_H_
+#ifndef _C9Y_PARALELL_H_
+#define _C9Y_PARALELL_H_
 
 #include "defines.h"
 
@@ -207,7 +207,6 @@ namespace c9y
         parallel_transform(begin(input), end(input), begin(state->mapped), map, chunk_size);
 
         // shuffle
-        state->shuffled;
         for (auto pair : state->mapped)
         {
             state->shuffled[pair.first].push_back(pair.second);

@@ -44,15 +44,12 @@ if(ENABLE_UNIT_TESTS)
   enable_testing()
 
   set(SOURCES_C9Y_TEST
-    c9y-test/algorithm_test.cpp
     c9y-test/async_test.cpp
-    c9y-test/control_flow_test.cpp
     c9y-test/latch_test.cpp
     c9y-test/main.cpp
     c9y-test/paralell_test.cpp
     c9y-test/queue_test.cpp
     c9y-test/sync_test.cpp
-    c9y-test/task_pool_test.cpp
     c9y-test/thread_pool_test.cpp
   )
   

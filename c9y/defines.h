@@ -1,4 +1,3 @@
-//
 // c9y - concurrency
 // Copyright 2017-2022 Sean Farrell
 //
@@ -19,12 +18,11 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-//
 
 #ifndef _C9Y_DEFINES_H_
 #define _C9Y_DEFINES_H_
 
-#define C9Y_VERSION "0.4.0"
+#define C9Y_VERSION "0.3.1"
 
 #if defined(_WIN32)
 #define C9Y_EXPORT __declspec(dllexport)

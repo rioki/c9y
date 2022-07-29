@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Made API documentation consisten and added missing bits.
+
 ## [0.3.0] - 2022-05-10
 
 ### Added

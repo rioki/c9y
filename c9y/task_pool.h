@@ -1,4 +1,3 @@
-//
 // c9y - concurrency
 // Copyright 2017-2022 Sean Farrell
 //
@@ -19,7 +18,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-//
 
 #ifndef _C9Y_TASK_POOL_H_
 #define _C9Y_TASK_POOL_H_
@@ -46,12 +44,8 @@ namespace c9y
         //! @param concurency the number of threads spawn.
         explicit task_pool(size_t concurency) noexcept;
 
-        task_pool(const thread_pool&) = delete;
-
         //! Destructor
         ~task_pool();
-
-        task_pool& operator = (const task_pool&) = delete;
 
         //! Add a task to the work queue.
         void enqueue(const std::function<void ()>& func) noexcept;
@@ -62,6 +56,9 @@ namespace c9y
         thread_pool                   pool;
 
         void thread_func() noexcept;
+
+        task_pool(const thread_pool&) = delete;
+        task_pool& operator = (const task_pool&) = delete;
     };
 }
 

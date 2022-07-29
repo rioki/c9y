@@ -1,4 +1,3 @@
-//
 // c9y - concurrency
 // Copyright 2017-2022 Sean Farrell
 //
@@ -19,7 +18,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-//
 
 #ifndef _C9Y_QUEUE_H_
 #define _C9Y_QUEUE_H_
@@ -33,14 +31,12 @@ namespace c9y
 {
     using namespace std::chrono_literals;
 
-    /**
-     * Thread Safe Queue
-     *
-     * This is a thread safe implementation of a queue.
-     *
-     * @note There is no really safe way to copy a queue, so this
-     * queue is not copyable or asingable.
-     **/
+    //! Thread Safe Queue
+    //!
+    //! This is a thread safe implementation of a queue.
+    //!
+    //! @note There is no really safe way to copy a queue, so this
+    //! queue is not copyable or asingable.
     template <typename T, class Container = std::deque<T>>
     class queue
     {
@@ -51,50 +47,36 @@ namespace c9y
         typedef typename Container::reference       reference;
         typedef typename Container::const_reference const_reference;
 
-        /**
-         * Create an empty queue.
-         **/
+        //! Create an empty queue.
         queue() {}
 
-        /**
-         * Initialize the queue with values.
-         *
-         * @param c the container to initialize the queue with
-         **/
+        //! Initialize the queue with values.
+        //!
+        //! @param c the container to initialize the queue with
         explicit
         queue(const Container& c)
         : container(c) {}
 
-        /**
-         * Initialize the queue with a reange of values.
-         *
-         * @param begin an iterator to the beginning of the range
-         * @param end an iterator to the one beond the end of the range
-         **/
+        //! Initialize the queue with a reange of values.
+        //!
+        //! @param begin an iterator to the beginning of the range
+        //! @param end an iterator to the one beond the end of the range
         template <class Iterator>
         queue(const Iterator& begin, const Iterator& end)
         : container(begin, end) {}
 
-        queue(const queue& other) = delete;
-
-        /**
-         * Destructor
-         **/
+        //! Destructor
         ~queue()
         {
             wake();
         }
 
-        queue& operator = (const queue& other) = delete;
-
-        /**
-         * Push a value onto the queue.
-         *
-         * @param value the value to push onto the queue
-         *
-         * This method will push the value onto the queue and
-         * wake up a thread that is wating in pop_wait.
-         **/
+        //! Push a value onto the queue.
+        //!
+        //! This method will push the value onto the queue and
+        //! wake up a thread that is wating in pop_wait.
+        //!
+        //! @param value the value to push onto the queue
         void push(const value_type& value)
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
@@ -102,15 +84,13 @@ namespace c9y
             cond.notify_one();
         }
 
-        /**
-         * Pop a value of the queue.
-         *
-         * @param value the value of the pop
-         * @return true if a value was poped of the queue
-         *
-         * This method will try to pop a value off the queue. If no value is
-         * in the queue, it will return false.
-         **/
+        //! Pop a value of the queue.
+        //!
+        //! This method will try to pop a value off the queue. If no value is
+        //! in the queue, it will return false.
+        //!
+        //! @param value the value of the pop
+        //! @return true if a value was poped of the queue
         bool pop(value_type& value)
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
@@ -126,20 +106,18 @@ namespace c9y
             }
         }
 
-        /**
-         * Pop a value of the queue, wait if nessesary.
-         *
-         * @param value the value of the pop
-         * @return true if a value was poped of the queue
-         *
-         * This method will try to pop a value off the queue. If no value is
-         * in the queue, it will wait until either a value is pushed onto the
-         * queue or wake is called.
-         *
-         * @warning It is quite simple to build a race condition with pop_wait 
-         * and wake. If you intend to reliably wake all waiting threads, use 
-         * pop_wait_for with a reasonable timeout. 
-         **/
+        //! Pop a value of the queue, wait if nessesary.
+        //!
+        //! This method will try to pop a value off the queue. If no value is
+        //! in the queue, it will wait until either a value is pushed onto the
+        //! queue or wake is called.
+        //!
+        //! @param value the value of the pop
+        //! @return true if a value was poped of the queue
+        //!
+        //! @warning It is quite simple to build a race condition with pop_wait
+        //! and wake. If you intend to reliably wake all waiting threads, use
+        //! pop_wait_for with a reasonable timeout.
         bool pop_wait(value_type& value)
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
@@ -161,17 +139,15 @@ namespace c9y
             }
         }
 
-        /**
-         * Pop a value of the queue, wait for a defined duration if nessesary.
-         *
-         * @param value the value of the pop
-         * @param duration the duration to wait for
-         * @return true if a value was poped of the queue
-         *
-         * This method will try to pop a value off the queue. If no value is
-         * in the queue, it will wait until either a value is pushed onto the
-         * queue or wake is called.
-         **/
+        //! Pop a value of the queue, wait for a defined duration if nessesary.
+        //!
+        //! This method will try to pop a value off the queue. If no value is
+        //! in the queue, it will wait until either a value is pushed onto the
+        //! queue or wake is called.
+        //!
+        //! @param value the value of the pop
+        //! @param duration the duration to wait for
+        //! @return true if a value was poped of the queue
         bool pop_wait_for(value_type& value, std::chrono::milliseconds duration)
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
@@ -193,9 +169,7 @@ namespace c9y
             }
         }
 
-        /**
-         * Wake up any threads that are wating in pop_wait.
-         **/
+        //! Wake up any threads that are wating in pop_wait.
         void wake()
         {
             cond.notify_all();
@@ -205,6 +179,9 @@ namespace c9y
         std::mutex              mutex;
         std::condition_variable cond;
         Container               container;
+
+        queue(const queue& other) = delete;
+        queue& operator = (const queue& other) = delete;
     };
 }
 

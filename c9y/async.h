@@ -1,4 +1,3 @@
-//
 // c9y - concurrency
 // Copyright 2017-2022 Sean Farrell
 //
@@ -19,7 +18,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-//
 
 #ifndef _C9Y_ASYNC_H_
 #define _C9Y_ASYNC_H_
@@ -39,6 +37,7 @@ namespace c9y
     //! Queue action to be executed on the shared thread pool with result
     //!
     //! @param func the function to execute.
+    //! @returns future that with the resulting value.
     template <typename T>
     std::future<T> async(const std::function<T ()>& func) noexcept
     {

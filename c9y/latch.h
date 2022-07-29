@@ -1,4 +1,3 @@
-//
 // c9y - concurrency
 // Copyright 2017-2022 Sean Farrell
 //
@@ -19,7 +18,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-//
 
 #ifndef _C9Y_LATCH_H_
 #define _C9Y_LATCH_H_
@@ -47,9 +45,8 @@ namespace c9y
 
         //! Constructs a latch and initializes its internal counter. The behavior is undefined if expected is negative or greater than max().
         explicit latch(std::ptrdiff_t expected);
-        latch(const latch&) = delete;
+
         ~latch() = default;
-        latch& operator = (const latch&) = delete;
 
         //! Atomically decrements the internal counter by n without blocking the caller.
         //!
@@ -69,6 +66,9 @@ namespace c9y
         std::ptrdiff_t                  count;
         mutable std::mutex              mutex;
         mutable std::condition_variable cond;
+
+        latch(const latch&) = delete;
+        latch& operator = (const latch&) = delete;
     };
 }
 

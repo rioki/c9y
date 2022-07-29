@@ -1,4 +1,3 @@
-//
 // c9y - concurrency
 // Copyright(c) 2017-2019 Sean Farrell
 //
@@ -19,7 +18,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-//
 
 #ifndef _C9Y_H_
 #define _C9Y_H_
@@ -28,5 +26,9 @@
 #include "thread_pool.h"
 #include "queue.h"
 #include "task_pool.h"
+#include "latch.h"
+#include "async.h"
+#include "sync.h"
+#include "parallel.h"
 
 #endif

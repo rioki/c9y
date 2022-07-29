@@ -1,4 +1,3 @@
-//
 // c9y - concurrency
 // Copyright 2017-2022 Sean Farrell
 //
@@ -19,7 +18,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-//
 
 #ifndef _C9Y_PARALELL_H_
 #define _C9Y_PARALELL_H_
@@ -194,6 +192,16 @@ namespace c9y
         std::list<std::pair<Key, OutValue>> reduced;
     };
 
+    //! Map Reduce in Paralell
+    //!
+    //! This function will map and reduce input using the map / deuce algorithm using as many threads
+    //! as sensibly usefull.
+    //!
+    //! @param input input collection
+    //! @param output output collection
+    //! @param map the function to map from value to key
+    //! @param reduce the function to reduce from key to result
+    //! @param chunk_size the size of the batches used to form tasks
     template <class InCollection, class OutCollection>
     void parallel_map_reduce(const InCollection& input, OutCollection& output,
                              std::function<typename OutCollection::value_type(const typename InCollection::value_type)> map,

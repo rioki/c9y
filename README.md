@@ -30,9 +30,16 @@ waiting for all of them to compleate.
 
 The following standard algorithms are implemented:
 
-- parallel_generate
-- parallel_transform
+- parallel_all_of
+- parallel_any_of
 - parallel_copy
+- parallel_count
+- parallel_count_if
+- parallel_for_each
+- parallel_generate
+- parallel_none_of
+- parallel_reduce
+- parallel_transform
 
 Also a parallel parallel_map_reduce is provided to implement the map/reduce
 algorithm.

@@ -11,11 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - parallel_all_of
 - parallel_any_of
-- parallel_none_of
+- parallel_copy_if
 - parallel_count
 - parallel_count_if
-- parallel_reduce
 - parallel_for_each
+- parallel_none_of
+- parallel_reduce
 
 ### Fixed
 

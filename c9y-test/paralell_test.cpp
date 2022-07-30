@@ -238,7 +238,7 @@ std::vector<std::string> tokenize(const std::string_view str, const std::string_
     return gibs;
 }
 
-TEST(parallel, tokenize)
+TEST(test, tokenize)
 {
     const char* text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
     const std::vector<std::string> ref = {"Lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit"};

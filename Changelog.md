@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- parallel_all_of
+- parallel_any_of
+- parallel_none_of
+- parallel_count
+- parallel_count_if
+- parallel_reduce
+- parallel_for_each
+
 ### Fixed
 
 - Made API documentation consisten and added missing bits.

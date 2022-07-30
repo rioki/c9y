@@ -27,6 +27,7 @@
 #include <functional>
 #include <vector>
 #include <list>
+#include <numeric>
 #include <algorithm>
 #include <map>
 
@@ -70,7 +71,7 @@ namespace c9y
     //! @param begin the beginning of the sequence
     //! @param end the end of the sequence
     //! @param tasks a collection of task
-    inline void parallel(const std::list<std::function<void ()>>& tasks) noexcept
+    inline void parallel(const std::vector<std::function<void ()>>& tasks) noexcept
     {
         parallel(begin(tasks), end(tasks));
     }
@@ -87,6 +88,246 @@ namespace c9y
         return n;
     }
 
+    //! Checks if unary predicate returns true for all elements in the range.
+    //!
+    //! This function emulates std::all_of, but runs in parallel.
+    //!
+    //! @param first beginning of the sequence
+    //! @param last the end of the sequence
+    //! @param predicate the function is called for each element
+    //! @param chunk_size the size of the batches used to form tasks
+    //!
+    //! @see parallel
+    template <class InIterator, class UnaryOperation>
+    bool parallel_all_of(InIterator first, InIterator last, UnaryOperation predicate, unsigned int chunk_size = default_chunk_size)
+    {
+        auto tasks   = std::vector<std::function<void ()>>{};
+        auto results = std::vector<bool>((std::distance(first, last) / chunk_size) + 1u, false);
+
+        auto b  = first;
+        auto e  = b;
+        auto ri = 0;
+        safe_advance(e, last, chunk_size);
+        while (b != last)
+        {
+            tasks.push_back([b, e, ri, &results, &predicate] () {
+                results[ri] = std::all_of(b, e, predicate);
+            });
+            b = e;
+            safe_advance(e, last, chunk_size);
+            ri++;
+        }
+
+        parallel(tasks);
+
+        return std::all_of(begin(results), end(results), [] (auto v) {return v;});
+    }
+
+    //! Checks if unary predicate returns true for at least one element in the range.
+    //!
+    //! This function emulates std::none_of, but runs in parallel.
+    //!
+    //! @param first beginning of the sequence
+    //! @param last the end of the sequence
+    //! @param predicate the function is called for each element
+    //! @param chunk_size the size of the batches used to form tasks
+    //!
+    //! @see parallel
+    template <class InIterator, class UnaryOperation>
+    bool parallel_any_of(InIterator first, InIterator last, UnaryOperation predicate, unsigned int chunk_size = default_chunk_size)
+    {
+        auto tasks   = std::vector<std::function<void ()>>{};
+        auto results = std::vector<bool>((std::distance(first, last) / chunk_size) + 1u, false);
+
+        auto b  = first;
+        auto e  = b;
+        auto ri = 0;
+        safe_advance(e, last, chunk_size);
+        while (b != last)
+        {
+            tasks.push_back([b, e, ri, &results, &predicate] () {
+                results[ri] = std::any_of(b, e, predicate);
+            });
+            b = e;
+            safe_advance(e, last, chunk_size);
+            ri++;
+        }
+
+        parallel(tasks);
+
+        return std::any_of(begin(results), end(results), [] (auto v) {return v;});
+    }
+
+    //! Checks if unary predicate returns true for no elements in the range .
+    //!
+    //! This function emulates std::none_of, but runs in parallel.
+    //!
+    //! @param first beginning of the sequence
+    //! @param last the end of the sequence
+    //! @param predicate the function is called for each element
+    //! @param chunk_size the size of the batches used to form tasks
+    //!
+    //! @see parallel
+    template <class InIterator, class UnaryOperation>
+    bool parallel_none_of(InIterator first, InIterator last, UnaryOperation predicate, unsigned int chunk_size = default_chunk_size)
+    {
+        auto tasks   = std::vector<std::function<void ()>>{};
+        auto results = std::vector<bool>((std::distance(first, last) / chunk_size) + 1u, false);
+
+        auto b  = first;
+        auto e  = b;
+        auto ri = 0;
+        safe_advance(e, last, chunk_size);
+        while (b != last)
+        {
+            tasks.push_back([b, e, ri, &results, &predicate] () {
+                results[ri] = std::none_of(b, e, predicate);
+            });
+            b = e;
+            safe_advance(e, last, chunk_size);
+            ri++;
+        }
+
+        parallel(tasks);
+
+        // Once we found the sequences that match none_of all of them must be true,
+        // for all of them to be true.
+        return std::all_of(begin(results), end(results), [] (auto v) {return v;});
+    }
+
+    //! Counts the elements that are equal to value.
+    //!
+    //! This function emulates std::count, but runs in parallel.
+    //!
+    //! @param first beginning of the sequence
+    //! @param last the end of the sequence
+    //! @param value the value to count
+    //! @param chunk_size the size of the batches used to form tasks
+    //!
+    //! @see parallel
+    template <class Iterator, class Type>
+    size_t parallel_count(Iterator first, Iterator last, Type value, unsigned int chunk_size = default_chunk_size)
+    {
+        auto tasks   = std::vector<std::function<void ()>>{};
+        auto results = std::vector<size_t>((std::distance(first, last) / chunk_size) + 1u, 0u);
+
+        auto b  = first;
+        auto e  = b;
+        auto ri = 0;
+        safe_advance(e, last, chunk_size);
+        while (b != last)
+        {
+            tasks.push_back([b, e, ri, &results, &value] () {
+                results[ri] = std::count(b, e, value);
+            });
+            b = e;
+            safe_advance(e, last, chunk_size);
+            ri++;
+        }
+
+        parallel(tasks);
+
+        return std::accumulate(begin(results), end(results), size_t{0u});
+    }
+
+    //! counts elements for which predicate returns true.
+    //!
+    //! This function emulates std::count, but runs in parallel.
+    //!
+    //! @param first beginning of the sequence
+    //! @param last the end of the sequence
+    //! @param predicate the function is called for each element
+    //! @param chunk_size the size of the batches used to form tasks
+    //!
+    //! @see parallel
+    template <class Iterator, class UnaryOperation>
+    size_t parallel_count_if(Iterator first, Iterator last, UnaryOperation predicate, unsigned int chunk_size = default_chunk_size)
+    {
+        auto tasks   = std::vector<std::function<void ()>>{};
+        auto results = std::vector<size_t>((std::distance(first, last) / chunk_size) + 1u, 0u);
+
+        auto b  = first;
+        auto e  = b;
+        auto ri = 0;
+        safe_advance(e, last, chunk_size);
+        while (b != last)
+        {
+            tasks.push_back([b, e, ri, &results, &predicate] () {
+                results[ri] = std::count_if(b, e, predicate);
+            });
+            b = e;
+            safe_advance(e, last, chunk_size);
+            ri++;
+        }
+
+        parallel(tasks);
+
+        return std::accumulate(begin(results), end(results), size_t{0u});
+    }
+
+    //! Reduces the range, possibly permuted and aggregated in unspecified manner.
+    //!
+    //! This function emulates std::count, but runs in parallel.
+    //!
+    //! @param first beginning of the sequence
+    //! @param last the end of the sequence
+    //! @param init the initial value
+    //! @param binary_op operator used to combine two values
+    //! @param chunk_size the size of the batches used to form tasks
+    //!
+    //! @see parallel
+    //! @{
+    template <class Iterator, class Type>
+    Type parallel_reduce(Iterator first, Iterator last, Type init, unsigned int chunk_size = default_chunk_size)
+    {
+        auto tasks   = std::vector<std::function<void ()>>{};
+        auto results = std::vector<Type>((std::distance(first, last) / chunk_size) + 1u, init);
+
+        auto b  = first;
+        auto e  = b;
+        auto ri = 0;
+        safe_advance(e, last, chunk_size);
+        while (b != last)
+        {
+            tasks.push_back([b, e, ri, &results, &init] () {
+                results[ri] = std::reduce(b, e, init);
+            });
+            b = e;
+            safe_advance(e, last, chunk_size);
+            ri++;
+        }
+
+        parallel(tasks);
+
+        return std::reduce(begin(results), end(results), init);
+    }
+
+    template <class Iterator, class Type, class BinaryOperator>
+    Type parallel_reduce(Iterator first, Iterator last, Type init, BinaryOperator binary_op, unsigned int chunk_size = default_chunk_size)
+    {
+        auto tasks   = std::vector<std::function<void ()>>{};
+        auto results = std::vector<Type>((std::distance(first, last) / chunk_size) + 1u, init);
+
+        auto b  = first;
+        auto e  = b;
+        auto ri = 0;
+        safe_advance(e, last, chunk_size);
+        while (b != last)
+        {
+            tasks.push_back([b, e, ri, &results, &init, &binary_op] () {
+                results[ri] = std::reduce(b, e, init, binary_op);
+            });
+            b = e;
+            safe_advance(e, last, chunk_size);
+            ri++;
+        }
+
+        parallel(tasks);
+
+        return std::reduce(begin(results), end(results), init, binary_op);
+    }
+    //! @}
+
     //! Generate a number of values.
     //!
     //! This function emulates std::generate, but runs in parallel.
@@ -100,14 +341,14 @@ namespace c9y
     template <class Iterator, class Generator>
     void parallel_generate(Iterator start, Iterator end, Generator generator, unsigned int chunk_size = default_chunk_size)
     {
-        auto tasks = std::list<std::function<void ()>>{};
+        auto tasks = std::vector<std::function<void ()>>{};
 
         auto b = start;
         auto e = b;
         safe_advance(e, end, chunk_size);
         while (b != end)
         {
-            tasks.push_back([b, e, generator] () {
+            tasks.push_back([b, e, &generator] () {
                 std::generate(b, e, generator);
             });
             b = e;
@@ -117,7 +358,6 @@ namespace c9y
         parallel(tasks);
     }
 
-
     //! Transform one sequance to an other.
     //!
     //! This function emulates std::transform, but runs in parallel.
@@ -125,27 +365,57 @@ namespace c9y
     //! @param istart beginning of the input sequence
     //! @param iend the end of the input sequence
     //! @param ostart beginning of the output sequence
-    //! @param transmuter the function to alters the values
+    //! @param operation the function to alters the values
     //! @param chunk_size the size of the batches used to form tasks
     //!
     //! @see parallel
     template <class InIterator, class OutIterator, class UnaryOperation>
     void parallel_transform(InIterator istart, InIterator iend, OutIterator ostart, UnaryOperation operation, unsigned int chunk_size = default_chunk_size)
     {
-        auto tasks = std::list<std::function<void ()>>{};
+        auto tasks = std::vector<std::function<void ()>>{};
 
         auto ib = istart;
         auto ie = ib;
         safe_advance(ie, iend, chunk_size);
         auto ob = ostart;
-        while (ie != iend)
+        while (ib != iend)
         {
-            tasks.push_back([ib, ie, ob, operation] () {
+            tasks.push_back([ib, ie, ob, &operation] () {
                 std::transform(ib, ie, ob, operation);
             });
             ib = ie;
             auto n = safe_advance(ie, iend, chunk_size);
             std::advance(ob, n);
+        }
+
+        parallel(tasks);
+    }
+
+    //! Execture a function for each element in a sequence.
+    //!
+    //! This function emulates std::for_rach, but runs in parallel.
+    //!
+    //! @param start beginning of the sequence
+    //! @param end the end of the sequence
+    //! @param operation the function is called for each element
+    //! @param chunk_size the size of the batches used to form tasks
+    //!
+    //! @see parallel
+    template <class InIterator, class UnaryOperation>
+    void parallel_for_each(InIterator start, InIterator end, UnaryOperation operation, unsigned int chunk_size = default_chunk_size)
+    {
+        auto tasks = std::vector<std::function<void ()>>{};
+
+        auto b = start;
+        auto e = b;
+        safe_advance(e, end, chunk_size);
+        while (b != end)
+        {
+            tasks.push_back([b, e, &operation] () {
+                std::for_each(b, e, operation);
+            });
+            b = e;
+            auto n = safe_advance(e, end, chunk_size);
         }
 
         parallel(tasks);
@@ -165,13 +435,13 @@ namespace c9y
     template <class InIterator, class OutIterator>
     void parallel_copy(InIterator istart, InIterator iend, OutIterator ostart, unsigned int chunk_size = default_chunk_size)
     {
-        auto tasks = std::list<std::function<void ()>>{};
+        auto tasks = std::vector<std::function<void ()>>{};
 
         auto ib = istart;
         auto ie = ib;
         safe_advance(ie, iend, chunk_size);
         auto ob = ostart;
-        while (ie != iend)
+        while (ib != iend)
         {
             tasks.push_back([ib, ie, ob] () {
                 std::copy(ib, ie, ob);
@@ -215,9 +485,9 @@ namespace c9y
         parallel_transform(begin(input), end(input), begin(state->mapped), map, chunk_size);
 
         // shuffle
-        for (auto pair : state->mapped)
+        for (const auto& [key, value] : state->mapped)
         {
-            state->shuffled[pair.first].push_back(pair.second);
+            state->shuffled[key].push_back(value);
         }
 
         // reduce

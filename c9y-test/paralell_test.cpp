@@ -23,6 +23,7 @@
 
 #include <c9y/parallel.h>
 
+#include <cstdlib>
 #include <atomic>
 #include <array>
 #include <gtest/gtest.h>
@@ -94,13 +95,120 @@ TEST(parallel, parallel_transform)
     EXPECT_EQ(source[42] + 1, result[42]);
 }
 
+TEST(parallel, parallel_for_each)
+{
+    auto source = std::vector<unsigned int>(1000);
+
+    auto idx = 0u;
+    std::generate(begin(source), end(source), [&] () {
+        return ++idx;
+    });
+
+    c9y::parallel_for_each(begin(source), end(source), [] (auto& value) {
+        value = value + 1;
+    });
+    EXPECT_EQ(44, source[42]);
+}
+
+TEST(parallel, parallel_all_of)
+{
+    auto ok = std::vector<bool>(1000, true);
+    auto nok = ok;
+    nok[13] = false;
+
+    auto a = c9y::parallel_all_of(begin(ok), end(ok), [] (auto value) {
+        return value;
+    });
+    EXPECT_TRUE(a);
+    auto b = c9y::parallel_all_of(begin(nok), end(nok), [] (auto value) {
+        return value;
+    });
+    EXPECT_FALSE(b);
+}
+
+TEST(parallel, parallel_any_of)
+{
+    auto nok = std::vector<bool>(1000, false);
+    auto ok = nok;
+    ok[13] = true;
+
+    auto a = c9y::parallel_any_of(begin(ok), end(ok), [] (auto value) {
+        return value;
+    });
+    EXPECT_TRUE(a);
+    auto b = c9y::parallel_any_of(begin(nok), end(nok), [] (auto value) {
+        return value;
+    });
+    EXPECT_FALSE(b);
+}
+
+TEST(parallel, parallel_none_of)
+{
+    auto ok = std::vector<bool>(1000, false);
+    auto nok = ok;
+    nok[13] = true;
+
+    auto a = c9y::parallel_none_of(begin(ok), end(ok), [] (auto value) {
+        return value;
+    });
+    EXPECT_TRUE(a);
+    auto b = c9y::parallel_none_of(begin(nok), end(nok), [] (auto value) {
+        return value;
+    });
+    EXPECT_FALSE(b);
+}
+
+TEST(parallel, parallel_count)
+{
+    auto values = std::vector<int>(1000, false);
+    std::generate(begin(values), end(values), [&] () {
+        return std::rand() % 3;
+    });
+
+    auto ref = std::count(begin(values), end(values), 1);
+    auto tst = c9y::parallel_count(begin(values), end(values), 1);
+    EXPECT_EQ(ref, tst);
+}
+
+TEST(parallel, parallel_count_if)
+{
+    auto values = std::vector<int>(1000, false);
+    std::generate(begin(values), end(values), [&] () {
+        return std::rand();
+    });
+
+    auto ref = std::count_if(begin(values), end(values), [] (auto v) { return v % 3 == 1;});
+    auto tst = c9y::parallel_count_if(begin(values), end(values), [] (auto v) { return v % 3 == 1;});
+    EXPECT_EQ(ref, tst);
+}
+
 TEST(parallel, parallel_copy)
 {
     auto source = std::vector<unsigned int>(1000);
     auto result = std::vector<unsigned int>(1000);
 
+    std::generate(begin(source), end(source), [&] () {
+        return std::rand();
+    });
+
     c9y::parallel_copy(begin(source), end(source), begin(result));
     EXPECT_EQ(source[42], result[42]);
+}
+
+TEST(parallel, parallel_reduce)
+{
+    auto values = std::vector<unsigned int>(1000);
+    std::generate(begin(values), end(values), [&] () {
+        return std::rand();
+    });
+
+    auto ref1 = std::reduce(begin(values), end(values), 0u);
+    auto tst1 = c9y::parallel_reduce(begin(values), end(values), 0u);
+    EXPECT_EQ(ref1, tst1);
+
+    auto ref2 = std::reduce(begin(values), end(values), 0u, [] (auto a, auto b) { return a + b;});
+    auto tst2 = c9y::parallel_reduce(begin(values), end(values), 0u, [] (auto a, auto b) { return a + b;});
+    EXPECT_EQ(ref2, tst2);
 }
 
 std::vector<std::string> tokenize(const std::string_view str, const std::string_view delimiters)
@@ -122,12 +230,20 @@ std::vector<std::string> tokenize(const std::string_view str, const std::string_
         else
         {
             gib = str.substr(start, end - start);
-            start = end + 1;
+            start = str.find_first_not_of(delimiters, end);
         }
         gibs.push_back(gib);
     }
 
     return gibs;
+}
+
+TEST(test, tokenize)
+{
+    const char* text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+    const std::vector<std::string> ref = {"Lorem", "ipsum", "dolor", "sit", "amet", "consectetur", "adipiscing", "elit"};
+    const std::vector<std::string> test = tokenize(text, " ,.\n");
+    EXPECT_EQ(ref, test);
 }
 
 const char* text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sit amet magna ante. Sed dapibus maximus nibh non pretium. Sed ullamcorper, metus et rutrum scelerisque, libero eros tincidunt dolor, eget lobortis est lorem vitae felis. Nam dictum risus gravida odio finibus, vel facilisis lacus suscipit. Sed orci augue, commodo vitae odio vitae, vestibulum sollicitudin enim. Nulla sit amet placerat quam. Donec et est tempor, fermentum sapien id, posuere felis. Proin quis consectetur nibh. Fusce faucibus feugiat risus et porta. Proin nec ipsum venenatis, aliquam nisi eget, sagittis orci. Suspendisse ex velit, convallis posuere ligula nec, laoreet consequat lorem.\n"
@@ -148,4 +264,5 @@ TEST(parallel, parallel_map_reduce)
     });
 
     EXPECT_EQ(8, result["non"]);
+    EXPECT_EQ(7, result["arcu"]);
 }

@@ -36,5 +36,8 @@
     <ClCompile Include="paralell_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="coroutine_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

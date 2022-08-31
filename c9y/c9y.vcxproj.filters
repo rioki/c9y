@@ -42,6 +42,9 @@
     <ClInclude Include="c9y.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="coroutine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="thread_pool.cpp">

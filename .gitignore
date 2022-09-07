@@ -1,6 +1,16 @@
-.tmp
-.vs
+
+# Build Output
 x86
 x64
+.tmp
+
+# VS Temp Files
+.vs
 *.user
+
+# vcpkg package store
 /vcpkg_installed
+
+# Temp Files Diff Tools Spew Out
+*.bak
+*.old

@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - add support for coroutines using both sync and async mechanics.
 
+### Fixed
+
+- Added missing c9yConfig.cmake module export.
+
 ## [0.4.0] - 2022-07-30
 
 ### Added

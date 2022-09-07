@@ -75,3 +75,22 @@ install(TARGETS ${PROJECT_NAME}
     ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include/c9y
 )
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("${PROJECT_BINARY_DIR}/c9yConfigVersion.cmake"
+                                 COMPATIBILITY SameMajorVersion)
+
+configure_package_config_file(${PROJECT_SOURCE_DIR}/c9yConfig.cmake.in
+                                c9yConfig.cmake
+                                INSTALL_DESTINATION share/c9y)
+
+install(FILES
+        "${PROJECT_BINARY_DIR}/c9yConfig.cmake"
+        "${PROJECT_BINARY_DIR}/c9yConfigVersion.cmake"
+        DESTINATION share/c9y
+)
+
+install(EXPORT c9yTargets
+        NAMESPACE c9y::
+        DESTINATION share/c9y
+)

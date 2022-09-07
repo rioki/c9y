@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.8)
 project(c9y CXX)
 
+set(PROJECT_VERSION 0.4.1)
+set(PROJECT_VERSION_MAJOR 0)
+set(PROJECT_VERSION_MINOR 4)
+set(PROJECT_VERSION_PATCH 1)
+
 option(ENABLE_UNIT_TESTS "Enable building unit tests." OFF)
 
 set(CMAKE_SHARED_LIBRARY_PREFIX)

@@ -22,6 +22,8 @@
 #ifndef _C9Y_COROUTINE_H_
 #define _C9Y_COROUTINE_H_
 
+#ifdef __cpp_lib_coroutine
+
 #include "defines.h"
 
 #include <future>
@@ -160,4 +162,5 @@ namespace c9y
     }
 }
 
+#endif
 #endif

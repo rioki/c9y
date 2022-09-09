@@ -21,6 +21,8 @@
 // SOFTWARE.
 //
 
+#ifdef __cpp_lib_coroutine
+
 #include <chrono>
 #include <coroutine>
 #include <exception>
@@ -79,3 +81,4 @@ TEST(coroutine, fail)
     EXPECT_THROW(fail().get(), std::runtime_error);
 }
 
+#endif

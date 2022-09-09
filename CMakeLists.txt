@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.8)
 project(c9y CXX)
 
+set(PROJECT_VERSION 0.4.1)
+set(PROJECT_VERSION_MAJOR 0)
+set(PROJECT_VERSION_MINOR 4)
+set(PROJECT_VERSION_PATCH 1)
+
 option(ENABLE_UNIT_TESTS "Enable building unit tests." OFF)
 
 set(CMAKE_SHARED_LIBRARY_PREFIX)
@@ -10,9 +15,10 @@ if(ENABLE_UNIT_TESTS)
   find_package(GTest CONFIG REQUIRED)
 endif()
 
-set(HEADERS_C9Y
+set(HEADERS
   c9y/async.h
   c9y/c9y.h
+  c9y/coroutine.h
   c9y/defines.h
   c9y/latch.h
   c9y/parallel.h
@@ -22,7 +28,7 @@ set(HEADERS_C9Y
   c9y/thread_pool.h
 )
 
-set(SOURCES_C9Y
+set(SOURCES
   c9y/async.cpp
   c9y/latch.cpp
   c9y/parallel.cpp
@@ -32,10 +38,10 @@ set(SOURCES_C9Y
 )
 
 # c9y library
-add_library(c9y ${SOURCES_C9Y})
+add_library(c9y ${SOURCES})
 set_target_properties(c9y PROPERTIES
     CXX_STANDARD 20
-    PUBLIC_HEADER "${HEADERS_C9Y}"
+    PUBLIC_HEADER "${HEADERS}"
 )
 
 # c9y-test 
@@ -43,8 +49,9 @@ if(ENABLE_UNIT_TESTS)
 
   enable_testing()
 
-  set(SOURCES_C9Y_TEST
+  set(TEST_SOURCES
     c9y-test/async_test.cpp
+    c9y-test/coroutine_test.cpp
     c9y-test/latch_test.cpp
     c9y-test/main.cpp
     c9y-test/paralell_test.cpp
@@ -54,7 +61,7 @@ if(ENABLE_UNIT_TESTS)
   )
   
   include_directories(.)
-  add_executable(c9y-test ${SOURCES_C9Y_TEST})
+  add_executable(c9y-test ${TEST_SOURCES})
   set_target_properties(c9y-test PROPERTIES
     CXX_STANDARD 20
   )
@@ -64,14 +71,30 @@ if(ENABLE_UNIT_TESTS)
 endif()
 
 # install
-target_include_directories(c9y PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/c9y>
-    $<INSTALL_INTERFACE:include/c9y>)
+install(
+  TARGETS c9y
+  EXPORT c9yTargets
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
+  PUBLIC_HEADER DESTINATION include/rioki/glow
+)
 
-install(TARGETS ${PROJECT_NAME}
-    EXPORT litehtmlTargets
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    PUBLIC_HEADER DESTINATION include/c9y
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("${PROJECT_BINARY_DIR}/c9yConfigVersion.cmake"
+                                 COMPATIBILITY SameMajorVersion)
+
+configure_package_config_file(${PROJECT_SOURCE_DIR}/c9yConfig.cmake.in
+                                c9yConfig.cmake
+                                INSTALL_DESTINATION share/c9y)
+
+install(FILES
+        "${PROJECT_BINARY_DIR}/c9yConfig.cmake"
+        "${PROJECT_BINARY_DIR}/c9yConfigVersion.cmake"
+        DESTINATION share/c9y
+)
+
+install(EXPORT c9yTargets
+        NAMESPACE c9y::
+        DESTINATION share/c9y
 )

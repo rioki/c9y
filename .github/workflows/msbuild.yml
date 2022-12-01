@@ -11,7 +11,7 @@ permissions:
   packages: write
 
 env:
-  VCPKG_COMMIT: c353ab281208b5696bd60132671d180cdb87ca29
+  VCPKG_COMMIT: 62d01b70df227850b728f5050418b917ad6d2b32
   VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
 
 jobs:
@@ -37,7 +37,6 @@ jobs:
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
         appendedCacheKey: ${{ matrix.triplet }}
-        doNotCache: true
     - name: 'Setup NuGet/Vcpkg Credentials'
       shell: 'bash'
       run: >

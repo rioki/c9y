@@ -37,6 +37,7 @@ jobs:
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
         appendedCacheKey: ${{ matrix.triplet }}
+        doNotCache: true
     - name: 'Setup NuGet/Vcpkg Credentials'
       shell: 'bash'
       run: >

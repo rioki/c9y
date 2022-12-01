@@ -28,6 +28,11 @@
 #include <mutex>
 #include <condition_variable>
 
+#ifdef max
+#warning "Undefined max. Defining the max macro will result in a compile error."
+#undef max
+#endif
+
 namespace c9y
 {
     //! latch

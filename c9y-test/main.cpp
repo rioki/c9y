@@ -29,6 +29,10 @@ int main(int argc, char* argv[])
 {
     std::srand(std::time(nullptr));
     testing::InitGoogleTest(&argc, argv);
+#ifndef _WIN32
+    // This is the default under Windows;
+    // and may result in compile errors.
     GTEST_FLAG_SET(death_test_style, "threadsafe");
+#endif
     return RUN_ALL_TESTS();
 }

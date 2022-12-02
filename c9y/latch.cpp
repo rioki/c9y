@@ -43,9 +43,13 @@ namespace c9y
         }
     }
 
-    bool latch::try_wait() const noexcept
+    bool latch::wait_for(std::chrono::milliseconds timeout) const noexcept
     {
-        wait();
+        auto lock = std::unique_lock<std::mutex>{mutex};
+        if (count > 0)
+        {
+            return cond.wait_for(lock, timeout) != std::cv_status::timeout;
+        }
         return true;
     }
 

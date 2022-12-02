@@ -27,6 +27,7 @@
 #include <cstddef>
 #include <mutex>
 #include <condition_variable>
+#include <chrono>
 
 #ifdef max
 #warning "Undefined max. Defining the max macro will result in a compile error."
@@ -62,7 +63,7 @@ namespace c9y
         //! Returns true only if the internal counter has reached zero.
         //!
         //! This function may spuriously return false with very low probability even if the internal counter has reached zero.
-        bool try_wait() const noexcept;
+        bool wait_for(std::chrono::milliseconds timeout) const noexcept;
 
         //! Blocks the calling thread until the internal counter reaches 0. If it is zero already, returns immediately.
         void wait() const;

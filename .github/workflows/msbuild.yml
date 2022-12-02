@@ -17,6 +17,7 @@ env:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         platform: [x86, x64]
         include:
@@ -57,11 +58,13 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: msbuild /m /p:Configuration=Debug /property:Platform=${{matrix.platform}} c9y.sln
     - name: Test (Debug)
+      continue-on-error: true
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: ${{matrix.platform}}/Debug/c9y-test.exe
     - name: Build (Release)
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: msbuild /m /p:Configuration=Release /property:Platform=${{matrix.platform}} c9y.sln
     - name: Test (Release)
+      continue-on-error: true
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: ${{matrix.platform}}/Release/c9y-test.exe

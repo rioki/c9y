@@ -36,8 +36,8 @@ TEST(latch, wait)
     for (auto i = 0u; i < 12; i++)
     {
         c9y::async([&] () {
-            my_latch.count_down();
             count++;
+            my_latch.count_down();
         });
     }
 

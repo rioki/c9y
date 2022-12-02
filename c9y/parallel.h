@@ -47,7 +47,7 @@ namespace c9y
 
     C9Y_EXPORT task_pool& _get_parallel_pool() noexcept;
 
-    size_t _get_results_size(const size_t size, const size_t chunk_size)
+    inline size_t _get_results_size(const size_t size, const size_t chunk_size)
     {
         if (size % chunk_size == 0)
         {

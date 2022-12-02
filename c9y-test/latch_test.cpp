@@ -28,6 +28,8 @@
 
 #include <c9y/async.h>
 
+using namespace std::chrono_literals;
+
 TEST(latch, wait)
 {
     auto my_latch = c9y::latch{12u};
@@ -42,5 +44,22 @@ TEST(latch, wait)
     }
 
     my_latch.wait();
+    EXPECT_EQ(12u, count);
+}
+
+TEST(latch, wait_for)
+{
+    auto my_latch = c9y::latch{12u};
+    auto count    = std::atomic<unsigned int>{0u};
+
+    for (auto i = 0u; i < 12; i++)
+    {
+        c9y::async([&] () {
+            count++;
+            my_latch.count_down();
+        });
+    }
+
+    while (!my_latch.wait_for(100ms)) {}
     EXPECT_EQ(12u, count);
 }

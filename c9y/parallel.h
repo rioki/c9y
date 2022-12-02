@@ -30,6 +30,7 @@
 #include <numeric>
 #include <algorithm>
 #include <map>
+#include <atomic>
 
 #include "latch.h"
 #include "task_pool.h"
@@ -42,9 +43,21 @@ namespace c9y
     //! tasks and this may be inefficient to queue each one individually.
     //! As a result they are chunked together. This is the default chunk size
     //! but each has it's own configurable value.
-    constexpr auto default_chunk_size = 32u;
+    constexpr size_t default_chunk_size = 32u;
 
     C9Y_EXPORT task_pool& _get_parallel_pool() noexcept;
+
+    inline size_t _get_results_size(const size_t size, const size_t chunk_size)
+    {
+        if (size % chunk_size == 0)
+        {
+            return size / chunk_size;
+        }
+        else
+        {
+            return size / chunk_size + 1;
+        }
+    }
 
     //! Execute a tasks in parallel.
     //!
@@ -99,10 +112,10 @@ namespace c9y
     //!
     //! @see parallel
     template <class InIterator, class UnaryOperation>
-    bool parallel_all_of(InIterator first, InIterator last, UnaryOperation predicate, unsigned int chunk_size = default_chunk_size)
+    bool parallel_all_of(InIterator first, InIterator last, UnaryOperation predicate, size_t chunk_size = default_chunk_size)
     {
         auto tasks   = std::vector<std::function<void ()>>{};
-        auto results = std::vector<bool>((std::distance(first, last) / chunk_size) + 1u, false);
+        auto results = std::vector<std::atomic<bool>>(_get_results_size(std::distance(first, last), chunk_size));
 
         auto b  = first;
         auto e  = b;
@@ -120,7 +133,7 @@ namespace c9y
 
         parallel(tasks);
 
-        return std::all_of(begin(results), end(results), [] (auto v) {return v;});
+        return std::all_of(begin(results), end(results), [] (const auto& v) {return v.load();});
     }
 
     //! Checks if unary predicate returns true for at least one element in the range.
@@ -134,10 +147,10 @@ namespace c9y
     //!
     //! @see parallel
     template <class InIterator, class UnaryOperation>
-    bool parallel_any_of(InIterator first, InIterator last, UnaryOperation predicate, unsigned int chunk_size = default_chunk_size)
+    bool parallel_any_of(InIterator first, InIterator last, UnaryOperation predicate, size_t chunk_size = default_chunk_size)
     {
         auto tasks   = std::vector<std::function<void ()>>{};
-        auto results = std::vector<bool>((std::distance(first, last) / chunk_size) + 1u, false);
+        auto results = std::vector<std::atomic<bool>>(_get_results_size(std::distance(first, last), chunk_size));
 
         auto b  = first;
         auto e  = b;
@@ -155,7 +168,7 @@ namespace c9y
 
         parallel(tasks);
 
-        return std::any_of(begin(results), end(results), [] (auto v) {return v;});
+        return std::any_of(begin(results), end(results), [] (const auto& v) {return v.load();});
     }
 
     //! Checks if unary predicate returns true for no elements in the range .
@@ -172,7 +185,7 @@ namespace c9y
     bool parallel_none_of(InIterator first, InIterator last, UnaryOperation predicate, unsigned int chunk_size = default_chunk_size)
     {
         auto tasks   = std::vector<std::function<void ()>>{};
-        auto results = std::vector<bool>((std::distance(first, last) / chunk_size) + 1u, false);
+        auto results = std::vector<std::atomic<bool>>(_get_results_size(std::distance(first, last), chunk_size));
 
         auto b  = first;
         auto e  = b;
@@ -192,7 +205,7 @@ namespace c9y
 
         // Once we found the sequences that match none_of all of them must be true,
         // for all of them to be true.
-        return std::all_of(begin(results), end(results), [] (auto v) {return v;});
+        return std::all_of(begin(results), end(results), [] (const auto& v) {return v.load();});
     }
 
     //! Counts the elements that are equal to value.
@@ -209,7 +222,7 @@ namespace c9y
     size_t parallel_count(Iterator first, Iterator last, Type value, unsigned int chunk_size = default_chunk_size)
     {
         auto tasks   = std::vector<std::function<void ()>>{};
-        auto results = std::vector<size_t>((std::distance(first, last) / chunk_size) + 1u, 0u);
+        auto results = std::vector<size_t>(_get_results_size(std::distance(first, last), chunk_size), 0u);
 
         auto b  = first;
         auto e  = b;
@@ -244,7 +257,7 @@ namespace c9y
     size_t parallel_count_if(Iterator first, Iterator last, UnaryOperation predicate, unsigned int chunk_size = default_chunk_size)
     {
         auto tasks   = std::vector<std::function<void ()>>{};
-        auto results = std::vector<size_t>((std::distance(first, last) / chunk_size) + 1u, 0u);
+        auto results = std::vector<size_t>(_get_results_size(std::distance(first, last), chunk_size), 0u);
 
         auto b  = first;
         auto e  = b;
@@ -281,7 +294,7 @@ namespace c9y
     Type parallel_reduce(Iterator first, Iterator last, Type init, unsigned int chunk_size = default_chunk_size)
     {
         auto tasks   = std::vector<std::function<void ()>>{};
-        auto results = std::vector<Type>((std::distance(first, last) / chunk_size) + 1u, init);
+        auto results = std::vector<Type>(_get_results_size(std::distance(first, last), chunk_size), init);
 
         auto b  = first;
         auto e  = b;
@@ -306,7 +319,7 @@ namespace c9y
     Type parallel_reduce(Iterator first, Iterator last, Type init, BinaryOperator binary_op, unsigned int chunk_size = default_chunk_size)
     {
         auto tasks   = std::vector<std::function<void ()>>{};
-        auto results = std::vector<Type>((std::distance(first, last) / chunk_size) + 1u, init);
+        auto results = std::vector<Type>(_get_results_size(std::distance(first, last), chunk_size), init);
 
         auto b  = first;
         auto e  = b;

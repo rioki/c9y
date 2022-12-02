@@ -94,7 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - condition class
 - lock class
 
-[Unreleased]: https://github.com/rioki/c9y/commits/master
+[Unreleased]: https://github.com/rioki/c9y/compare/v0.4.0...master
 
 [0.4.0]: https://github.com/rioki/c9y/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/rioki/c9y/commits/v0.3.0

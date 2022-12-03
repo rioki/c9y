@@ -77,7 +77,7 @@ install(
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
-  PUBLIC_HEADER DESTINATION include/rioki/glow
+  PUBLIC_HEADER DESTINATION include/rioki/c9y
 )
 
 include(CMakePackageConfigHelpers)

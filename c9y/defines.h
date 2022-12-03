@@ -22,7 +22,7 @@
 #ifndef _C9Y_DEFINES_H_
 #define _C9Y_DEFINES_H_
 
-#define C9Y_VERSION "0.4.0"
+#define C9Y_VERSION "0.5.0"
 
 #if defined(_WIN32)
 #define C9Y_EXPORT __declspec(dllexport)

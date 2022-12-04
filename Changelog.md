@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2022-12-04
+
+### Fixed
+
+- fixed sporadic early return in latch::wait
+
 ## [0.5.0] - 2022-12-03
 
 ### Added
@@ -96,8 +102,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - condition class
 - lock class
 
-[Unreleased]: https://github.com/rioki/c9y/compare/v0.4.0...master
+[Unreleased]: https://github.com/rioki/c9y/compare/v0.5.1...master
 
+[0.5.1]: https://github.com/rioki/c9y/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/rioki/c9y/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/rioki/c9y/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/rioki/c9y/commits/v0.3.0

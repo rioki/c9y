@@ -56,7 +56,11 @@ namespace c9y
     void latch::wait() const
     {
         auto lock = std::unique_lock<std::mutex>{mutex};
-        if (count > 0)
+
+        // https://en.cppreference.com/w/cpp/thread/condition_variable/wait
+        // std::condition_variable::wait also be unblocked spuriously.
+        // -> that is why we need to loop here.
+        while (count > 0)
         {
             cond.wait(lock);
         }

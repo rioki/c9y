@@ -30,7 +30,6 @@
 #include <numeric>
 #include <algorithm>
 #include <map>
-#include <atomic>
 
 #include "latch.h"
 #include "task_pool.h"
@@ -115,7 +114,7 @@ namespace c9y
     bool parallel_all_of(InIterator first, InIterator last, UnaryOperation predicate, size_t chunk_size = default_chunk_size)
     {
         auto tasks   = std::vector<std::function<void ()>>{};
-        auto results = std::vector<std::atomic<bool>>(_get_results_size(std::distance(first, last), chunk_size));
+        auto results = std::vector<bool>(_get_results_size(std::distance(first, last), chunk_size), false);
 
         auto b  = first;
         auto e  = b;
@@ -133,7 +132,7 @@ namespace c9y
 
         parallel(tasks);
 
-        return std::all_of(begin(results), end(results), [] (const auto& v) {return v.load();});
+        return std::all_of(begin(results), end(results), [] (const auto& v) {return v;});
     }
 
     //! Checks if unary predicate returns true for at least one element in the range.
@@ -150,7 +149,7 @@ namespace c9y
     bool parallel_any_of(InIterator first, InIterator last, UnaryOperation predicate, size_t chunk_size = default_chunk_size)
     {
         auto tasks   = std::vector<std::function<void ()>>{};
-        auto results = std::vector<std::atomic<bool>>(_get_results_size(std::distance(first, last), chunk_size));
+        auto results = std::vector<bool>(_get_results_size(std::distance(first, last), chunk_size), false);
 
         auto b  = first;
         auto e  = b;
@@ -168,7 +167,7 @@ namespace c9y
 
         parallel(tasks);
 
-        return std::any_of(begin(results), end(results), [] (const auto& v) {return v.load();});
+        return std::any_of(begin(results), end(results), [] (const auto& v) {return v;});
     }
 
     //! Checks if unary predicate returns true for no elements in the range .
@@ -185,7 +184,7 @@ namespace c9y
     bool parallel_none_of(InIterator first, InIterator last, UnaryOperation predicate, unsigned int chunk_size = default_chunk_size)
     {
         auto tasks   = std::vector<std::function<void ()>>{};
-        auto results = std::vector<std::atomic<bool>>(_get_results_size(std::distance(first, last), chunk_size));
+        auto results = std::vector<bool>(_get_results_size(std::distance(first, last), chunk_size));
 
         auto b  = first;
         auto e  = b;
@@ -205,7 +204,7 @@ namespace c9y
 
         // Once we found the sequences that match none_of all of them must be true,
         // for all of them to be true.
-        return std::all_of(begin(results), end(results), [] (const auto& v) {return v.load();});
+        return std::all_of(begin(results), end(results), [] (const auto& v) {return v;});
     }
 
     //! Counts the elements that are equal to value.

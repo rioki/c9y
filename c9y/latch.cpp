@@ -30,10 +30,10 @@ namespace c9y
         return std::numeric_limits<std::ptrdiff_t>::max();
     }
 
-    latch::latch(std::ptrdiff_t expected)
+    latch::latch(std::ptrdiff_t expected) noexcept
     : count(expected) {}
 
-    void latch::count_down(std::ptrdiff_t n)
+    void latch::count_down(std::ptrdiff_t n) noexcept
     {
         auto lock = std::unique_lock<std::mutex>{mutex};
         count -= n;
@@ -43,26 +43,9 @@ namespace c9y
         }
     }
 
-    bool latch::wait_for(std::chrono::milliseconds timeout) const noexcept
-    {
-        auto lock = std::unique_lock<std::mutex>{mutex};
-        if (count > 0)
-        {
-            return cond.wait_for(lock, timeout) != std::cv_status::timeout;
-        }
-        return true;
-    }
-
     void latch::wait() const
     {
         auto lock = std::unique_lock<std::mutex>{mutex};
-
-        // https://en.cppreference.com/w/cpp/thread/condition_variable/wait
-        // std::condition_variable::wait also be unblocked spuriously.
-        // -> that is why we need to loop here.
-        while (count > 0)
-        {
-            cond.wait(lock);
-        }
+        cond.wait(lock, [&]{return count == 0;});
     }
 }

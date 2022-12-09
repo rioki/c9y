@@ -52,7 +52,7 @@ namespace c9y
     //! @returns the main thread id set by set_main_thread_id
     //!
     //! @see set_main_thread_id
-    C9Y_EXPORT std::thread::id get_main_thread_id() noexcept;
+    C9Y_EXPORT [[nodiscard]] std::thread::id get_main_thread_id() noexcept;
 
     //! Queue action to be exectued by the given thread.
     //!
@@ -111,7 +111,7 @@ namespace c9y
     //!
     //! @see sync_point
     template <typename T>
-    std::future<T> sync(const std::thread::id& thread, const std::function<T()>& func) noexcept
+    [[nodiscard]] std::future<T> sync(const std::thread::id& thread, const std::function<T()>& func) noexcept
     {
         auto task = std::make_shared<std::packaged_task<T()>>(func);
         auto future = task->get_future();
@@ -129,7 +129,7 @@ namespace c9y
     //!
     //! @see sync_point
     template <typename T>
-    std::future<T> sync(once_tag& tag, const std::thread::id& thread, const std::function<T()>& func) noexcept
+    [[nodiscard]] std::future<T> sync(once_tag& tag, const std::thread::id& thread, const std::function<T()>& func) noexcept
     {
         auto task = std::make_shared<std::packaged_task<T()>>(func);
         auto future = task->get_future();
@@ -146,7 +146,7 @@ namespace c9y
     //! @see set_main_thread_id
     //! @see sync_point
     template <typename T>
-    std::future<T> sync(const std::function<T()>& func) noexcept
+    [[nodiscard]] std::future<T> sync(const std::function<T()>& func) noexcept
     {
         return sync<T>(get_main_thread_id(), func);
     }
@@ -159,7 +159,7 @@ namespace c9y
     //! @see set_main_thread_id
     //! @see sync_point
     template <typename T>
-    std::future<T> sync(once_tag& tag, const std::function<T()>& func) noexcept
+    [[nodiscard]] std::future<T> sync(once_tag& tag, const std::function<T()>& func) noexcept
     {
         return sync<T>(tag, get_main_thread_id(), func);
     }
@@ -199,25 +199,25 @@ namespace c9y
     //! @param that the this pointer to use
     //! @param method the class method to call.
     //! @{
-    inline std::function<void ()> sync_fun(const std::function<void ()>& func)
+    [[nodiscard]] inline std::function<void ()> sync_fun(const std::function<void ()>& func) noexcept
     {
         return [func] () {
             sync(func);
         };
     }
-    inline std::function<void ()> sync_fun(const std::thread::id& thread, const std::function<void ()>& func)
+    [[nodiscard]] inline std::function<void ()> sync_fun(const std::thread::id& thread, const std::function<void ()>& func) noexcept
     {
         return [func] () {
             sync(func);
         };
     }
-    inline std::function<void ()> sync_fun(once_tag& tag, const std::function<void ()>& func)
+    [[nodiscard]] inline std::function<void ()> sync_fun(once_tag& tag, const std::function<void ()>& func) noexcept
     {
         return [func] () {
             sync(func);
         };
     }
-    inline std::function<void ()> sync_fun(once_tag& tag,  const std::thread::id& thread, const std::function<void ()>& func)
+    [[nodiscard]] inline std::function<void ()> sync_fun(once_tag& tag,  const std::thread::id& thread, const std::function<void ()>& func) noexcept
     {
         return [func] () {
             sync(func);

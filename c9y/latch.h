@@ -47,7 +47,7 @@ namespace c9y
     {
     public:
         //! Returns the maximum value of the internal counter supported by the implementation.
-        static [[nodiscard]] std::ptrdiff_t max() noexcept;
+        [[nodiscard]] static std::ptrdiff_t max() noexcept;
 
         //! Constructs a latch and initializes its internal counter. The behavior is undefined if expected is negative or greater than max().
         explicit latch(std::ptrdiff_t expected) noexcept;

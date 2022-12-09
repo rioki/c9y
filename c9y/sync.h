@@ -199,25 +199,25 @@ namespace c9y
     //! @param that the this pointer to use
     //! @param method the class method to call.
     //! @{
-    inline [[nodiscard]]  std::function<void ()> sync_fun(const std::function<void ()>& func) noexcept
+    [[nodiscard]] inline std::function<void ()> sync_fun(const std::function<void ()>& func) noexcept
     {
         return [func] () {
             sync(func);
         };
     }
-    inline [[nodiscard]]  std::function<void ()> sync_fun(const std::thread::id& thread, const std::function<void ()>& func) noexcept
+    [[nodiscard]] inline std::function<void ()> sync_fun(const std::thread::id& thread, const std::function<void ()>& func) noexcept
     {
         return [func] () {
             sync(func);
         };
     }
-    inline [[nodiscard]]  std::function<void ()> sync_fun(once_tag& tag, const std::function<void ()>& func) noexcept
+    [[nodiscard]] inline std::function<void ()> sync_fun(once_tag& tag, const std::function<void ()>& func) noexcept
     {
         return [func] () {
             sync(func);
         };
     }
-    inline [[nodiscard]]  std::function<void ()> sync_fun(once_tag& tag,  const std::thread::id& thread, const std::function<void ()>& func) noexcept
+    [[nodiscard]] inline std::function<void ()> sync_fun(once_tag& tag,  const std::thread::id& thread, const std::function<void ()>& func) noexcept
     {
         return [func] () {
             sync(func);

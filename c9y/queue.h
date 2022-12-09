@@ -26,6 +26,7 @@
 #include <condition_variable>
 #include <deque>
 #include <chrono>
+#include <optional>
 
 namespace c9y
 {

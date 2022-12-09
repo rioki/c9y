@@ -63,7 +63,13 @@ namespace c9y
         //! Returns true only if the internal counter has reached zero.
         //!
         //! This function may spuriously return false with very low probability even if the internal counter has reached zero.
-        bool wait_for(std::chrono::milliseconds timeout) const noexcept;
+        template<class Rep, class Period>
+        bool wait_for(const std::chrono::duration<Rep, Period>& duration) const noexcept
+        {
+            auto lock = std::unique_lock<std::mutex>{mutex};
+            cond.wait_for(lock, duration, [&]{return count == 0;});
+            return count == 0;
+        }
 
         //! Blocks the calling thread until the internal counter reaches 0. If it is zero already, returns immediately.
         void wait() const;

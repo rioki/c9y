@@ -34,12 +34,14 @@ namespace c9y
     //! @param func the function to execute.
     C9Y_EXPORT void async(const std::function<void ()>& func) noexcept;
 
+    template <typename T> using AsyncFunc = T (*) ();
+
     //! Queue action to be executed on the shared thread pool with result
     //!
     //! @param func the function to execute.
     //! @returns future that with the resulting value.
-    template <typename T>
-    std::future<T> async(const std::function<T ()>& func) noexcept
+    template <typename T, typename Func = AsyncFunc<T>>
+    [[nodiscard]] std::future<T> async(const Func& func) noexcept
     {
         auto task = std::make_shared<std::packaged_task<T()>>(func);
         auto future = task->get_future();

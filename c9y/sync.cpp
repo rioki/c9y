@@ -89,16 +89,17 @@ namespace c9y
 
     std::vector<std::function<void()>> get_this_threads_tasks() noexcept
     {
-        std::scoped_lock<std::mutex> sl(tasks_mutex);
-        auto this_threads_tasks = tasks[std::this_thread::get_id()];
-        tasks[std::this_thread::get_id()] = std::vector<std::function<void ()>>();
+        auto lock = std::scoped_lock<std::mutex>{tasks_mutex};
+
+        auto this_threads_tasks = std::vector<std::function<void ()>>();
+        std::swap(tasks[std::this_thread::get_id()], this_threads_tasks);
+
         return this_threads_tasks;
     }
 
     void sync_point() noexcept
     {
-        auto tasks = get_this_threads_tasks();
-        for (const auto& task : tasks)
+        for (const auto& task : get_this_threads_tasks())
         {
             try
             {

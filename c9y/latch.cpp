@@ -23,6 +23,8 @@
 
 #include "latch.h"
 
+#include <cassert>
+
 namespace c9y
 {
     std::ptrdiff_t latch::max() noexcept
@@ -46,6 +48,7 @@ namespace c9y
     void latch::wait() const
     {
         auto lock = std::unique_lock<std::mutex>{mutex};
-        cond.wait(lock, [&]{return count == 0;});
+        cond.wait(lock, [&]{return count <= 0;});
+        assert(count <= 0);
     }
 }

@@ -34,35 +34,31 @@ namespace c9y
 
     task_pool::~task_pool()
     {
-        running = false;
         tasks.stop();
         pool.join();
     }
 
-    void task_pool::enqueue(const std::function<void ()>& func) noexcept
+    void task_pool::enqueue(const std::function<void ()>& func)
     {
         tasks.push(func);
     }
 
     void task_pool::thread_func() noexcept
     {
-        while (running)
+        while (auto task = tasks.pop_wait())
         {
-            if (auto task = tasks.pop_wait_for(100ms))
+            try
             {
-                try
-                {
-                    (*task)();
-                }
-                catch (const std::exception& ex)
-                {
-                    std::cerr << ex.what() << std::endl;
-                    std::terminate();
-                }
-                catch (...)
-                {
-                    std::terminate();
-                }
+                (*task)();
+            }
+            catch (const std::exception& ex)
+            {
+                std::cerr << ex.what() << std::endl;
+                std::terminate();
+            }
+            catch (...)
+            {
+                std::terminate();
             }
         }
     }

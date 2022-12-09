@@ -48,10 +48,9 @@ namespace c9y
         ~task_pool();
 
         //! Add a task to the work queue.
-        void enqueue(const std::function<void ()>& func) noexcept;
+        void enqueue(const std::function<void ()>& func);
 
     private:
-        std::atomic<bool>             running = true;
         queue<std::function<void ()>> tasks;
         thread_pool                   pool;
 
@@ -63,4 +62,3 @@ namespace c9y
 }
 
 #endif
-

@@ -49,8 +49,7 @@ TEST(queue, consumer_producer)
     }, 3};
 
     auto cons = c9y::thread_pool{[&] () {
-        int value = 0;
-        while (q.pop(value))
+        while (auto value = q.pop())
         {
             count++;
             std::this_thread::sleep_for(1ms);
@@ -77,8 +76,7 @@ TEST(queue, consumer_producer_wait)
     }, 3};
 
     auto cons = c9y::thread_pool{[&] () {
-        int value = 0;
-        while (q.pop_wait_for(value, 100ms))
+        while (auto value = q.pop_wait_for(100ms))
         {
             count++;
             std::this_thread::sleep_for(3ms);
@@ -87,7 +85,7 @@ TEST(queue, consumer_producer_wait)
 
     prod.join();
     std::this_thread::sleep_for(100ms);
-    q.wake();
+    q.stop();
     cons.join();
 
     EXPECT_EQ(300, static_cast<unsigned int>(count));

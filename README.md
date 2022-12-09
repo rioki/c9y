@@ -74,3 +74,7 @@ accumulated, preventing work to be redone multiple times.
 
 The c9y library is distributed under the MIT license. See [License.txt](License.txt)
 for details.
+
+## Thanks
+
+I would like to thank [G. Sliepen](https://codereview.stackexchange.com/users/129343/g-sliepen) for reviewing c9y's code.

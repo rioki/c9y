@@ -41,35 +41,25 @@ namespace c9y
     class queue
     {
     public:
-        typedef Container                           container_type;
-        typedef typename Container::value_type      value_type;
-        typedef typename Container::size_type       size_type;
-        typedef typename Container::reference       reference;
-        typedef typename Container::const_reference const_reference;
+        using container_type  =  Container;
+        using value_type      =  typename Container::value_type;
+        using size_type       =  typename Container::size_type;
+        using reference       =  typename Container::reference;
+        using const_reference =  typename Container::const_reference;
 
         //! Create an empty queue.
-        queue() {}
-
-        //! Initialize the queue with values.
-        //!
-        //! @param c the container to initialize the queue with
-        explicit
-        queue(const Container& c)
-        : container(c) {}
+        queue() noexcept(std::is_nothrow_constructible_v<Container>) = default;
 
         //! Initialize the queue with a reange of values.
         //!
         //! @param begin an iterator to the beginning of the range
         //! @param end an iterator to the one beond the end of the range
-        template <class Iterator>
-        queue(const Iterator& begin, const Iterator& end)
-        : container(begin, end) {}
+        template<typename... Args>
+        explicit queue(Args&&... args) noexcept(std::is_nothrow_constructible_v<Container, Args...>)
+        : container(std::forward<Args>(args)...) {}
 
         //! Destructor
-        ~queue()
-        {
-            wake();
-        }
+        ~queue() = default;
 
         //! Push a value onto the queue.
         //!
@@ -77,12 +67,26 @@ namespace c9y
         //! wake up a thread that is wating in pop_wait.
         //!
         //! @param value the value to push onto the queue
+        //!
+        //! @{
         void push(const value_type& value)
         {
-            auto lock = std::unique_lock<std::mutex>{mutex};
-            container.push_back(value);
+            {
+                auto lock = std::unique_lock<std::mutex>{mutex};
+                container.push_back(value);
+            }
             cond.notify_one();
         }
+
+        void emplace(value_type&& value)
+        {
+            {
+                auto lock = std::unique_lock<std::mutex>{mutex};
+                container.emplace_back(std::move(value));
+            }
+            cond.notify_one();
+        }
+        //! @}
 
         //! Pop a value of the queue.
         //!
@@ -91,18 +95,18 @@ namespace c9y
         //!
         //! @param value the value of the pop
         //! @return true if a value was poped of the queue
-        bool pop(value_type& value)
+        [[nodiscard]] std::optional<value_type> pop()
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
             if (!container.empty())
             {
-                value = container.front();
+                auto value = container.front();
                 container.pop_front();
-                return true;
+                return value;
             }
             else
             {
-                return false;
+                return std::nullopt;
             }
         }
 
@@ -118,25 +122,19 @@ namespace c9y
         //! @warning It is quite simple to build a race condition with pop_wait
         //! and wake. If you intend to reliably wake all waiting threads, use
         //! pop_wait_for with a reasonable timeout.
-        bool pop_wait(value_type& value)
+        [[nodiscard]] std::optional<value_type> pop_wait()
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
+            cond.wait(lock, [&]{return !container.empty() || stopped;});
 
             if (container.empty())
             {
-                cond.wait(lock);
+                return std::nullopt;
             }
 
-            if (!container.empty())
-            {
-                value = container.front();
-                container.pop_front();
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            auto value = container.front();
+            container.pop_front();
+            return value;
         }
 
         //! Pop a value of the queue, wait for a defined duration if nessesary.
@@ -148,30 +146,32 @@ namespace c9y
         //! @param value the value of the pop
         //! @param duration the duration to wait for
         //! @return true if a value was poped of the queue
-        bool pop_wait_for(value_type& value, std::chrono::milliseconds duration)
+        template<class Rep, class Period>
+        [[nodiscard]] std::optional<value_type> pop_wait_for(const std::chrono::duration<Rep, Period>& duration)
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
+            cond.wait_for(lock, duration, [&]{return !container.empty() || stopped;});
 
             if (container.empty())
             {
-                cond.wait_for(lock, duration);
+                return std::nullopt;
             }
 
-            if (!container.empty())
-            {
-                value = container.front();
-                container.pop_front();
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            auto value = container.front();
+            container.pop_front();
+            return value;
         }
 
-        //! Wake up any threads that are wating in pop_wait.
-        void wake()
+        //! Stop processing and wake any wating threads.
+        //!
+        //! This function should be called before destructing the queue and ensure
+        //! a clean exit can be done.
+        void stop()
         {
+            {
+                auto lock = std::unique_lock<std::mutex>{mutex};
+                stopped = true;
+            }
             cond.notify_all();
         }
 
@@ -179,6 +179,7 @@ namespace c9y
         std::mutex              mutex;
         std::condition_variable cond;
         Container               container;
+        bool                    stopped = false;
 
         queue(const queue& other) = delete;
         queue& operator = (const queue& other) = delete;

@@ -35,7 +35,7 @@ namespace c9y
     task_pool::~task_pool()
     {
         running = false;
-        tasks.wake();
+        tasks.stop();
         pool.join();
     }
 
@@ -46,14 +46,13 @@ namespace c9y
 
     void task_pool::thread_func() noexcept
     {
-        std::function<void()> task;
         while (running)
         {
-            if (tasks.pop_wait_for(task, 100ms))
+            if (auto task = tasks.pop_wait_for(100ms))
             {
                 try
                 {
-                    task();
+                    (*task)();
                 }
                 catch (const std::exception& ex)
                 {

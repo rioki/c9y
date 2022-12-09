@@ -60,7 +60,10 @@ namespace c9y
         : container(std::forward<Args>(args)...) {}
 
         //! Destructor
-        ~queue() = default;
+        ~queue()
+        {
+            stop();
+        }
 
         //! Push a value onto the queue.
         //!

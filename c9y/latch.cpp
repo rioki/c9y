@@ -30,10 +30,10 @@ namespace c9y
         return std::numeric_limits<std::ptrdiff_t>::max();
     }
 
-    latch::latch(std::ptrdiff_t expected)
+    latch::latch(std::ptrdiff_t expected) noexcept
     : count(expected) {}
 
-    void latch::count_down(std::ptrdiff_t n)
+    void latch::count_down(std::ptrdiff_t n) noexcept
     {
         auto lock = std::unique_lock<std::mutex>{mutex};
         count -= n;

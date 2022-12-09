@@ -47,7 +47,7 @@ namespace c9y
     {
     public:
         //! Returns the maximum value of the internal counter supported by the implementation.
-        static std::ptrdiff_t max() noexcept;
+        static [[nediscard]] std::ptrdiff_t max() noexcept;
 
         //! Constructs a latch and initializes its internal counter. The behavior is undefined if expected is negative or greater than max().
         explicit latch(std::ptrdiff_t expected);
@@ -64,7 +64,7 @@ namespace c9y
         //!
         //! This function may spuriously return false with very low probability even if the internal counter has reached zero.
         template<class Rep, class Period>
-        bool wait_for(const std::chrono::duration<Rep, Period>& duration) const noexcept
+        [[nediscard]] bool wait_for(const std::chrono::duration<Rep, Period>& duration) const noexcept
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
             cond.wait_for(lock, duration, [&]{return count == 0;});

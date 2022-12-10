@@ -48,7 +48,7 @@ namespace c9y
         //!
         //! This constructor will create @arg concurency threads that execute @arg thread_func.
         template <typename Callable>
-        thread_pool(Callable thread_func, size_t concurency = std::jthread::hardware_concurrency())
+        thread_pool(Callable thread_func, size_t concurency = std::thread::hardware_concurrency())
         {
             for (size_t i = 0; i < concurency; i++)
             {

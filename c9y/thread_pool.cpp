@@ -28,6 +28,13 @@
 
 namespace c9y
 {
+    #ifndef __cpp_lib_jthread
+    thread_pool::~thread_pool()
+    {
+        join();
+    }
+    #endif
+
     size_t thread_pool::get_concurency() const
     {
         return threads.size();
@@ -41,10 +48,12 @@ namespace c9y
         }
     }
 
+    #ifdef __cpp_lib_jthread
     bool thread_pool::request_stop() noexcept
     {
         return std::ranges::all_of(threads, [] (auto& thread) {
             return thread.request_stop();
         });
     }
+    #endif
 }

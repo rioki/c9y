@@ -39,7 +39,7 @@ namespace c9y
         //! The default constructor will create a thread pool, but with no threads.
         //! It can be used to create an instance on the stack that can later accept
         //! a running thread pool with move assignment.
-        thread_pool() noexcept;
+        thread_pool() noexcept = default;
 
         //! Create a thread pool.
         //!
@@ -47,19 +47,27 @@ namespace c9y
         //! @param concurency The number of threads to run concurently.
         //!
         //! This constructor will create @arg concurency threads that execute @arg thread_func.
-        thread_pool(std::function<void ()> thread_func, size_t concurency);
+        template <typename Callable>
+        thread_pool(Callable thread_func, size_t concurency = std::thread::hardware_concurrency())
+        {
+            for (size_t i = 0; i < concurency; i++)
+            {
+                threads.emplace_back(thread_func);
+            }
+        }
 
         //! Move Constructor
-        thread_pool(thread_pool&& other) noexcept;
+        thread_pool(thread_pool&& other) noexcept = default;
 
         //! Destructor
-        //!
-        //! @warning If the thread pool is not joined, the underlying std::thread
-        //! objects will invoke std::terminate.
+        #ifdef __cpp_lib_jthread
+        ~thread_pool() = default;
+        #else
         ~thread_pool();
+        #endif
 
         //! Move Asignment
-        thread_pool& operator = (thread_pool&& other) noexcept;
+        thread_pool& operator = (thread_pool&& other) noexcept = default;
 
         //! Get the concurency of the thread pool.
         size_t get_concurency() const;
@@ -70,12 +78,23 @@ namespace c9y
         //! the coresponsing memory is freed.
         void join();
 
+        #ifdef __cpp_lib_jthread
+        //! Request the thread pool to stop.
         //!
-        //! Swap thread pool.
-        void swap(thread_pool& other) noexcept;
+        //! If the thread function was initialized with a stop_token and handles
+        //! it, this function will signal the stop token.
+        //!
+        //! @returns true if the stop request could be issues to all threads.
+        bool request_stop() noexcept;
+        #endif
 
     private:
+        #ifdef __cpp_lib_jthread
+        std::vector<std::jthread> threads;
+        #else
+        // clang, update your stdlib!
         std::vector<std::thread> threads;
+        #endif
 
         thread_pool(const thread_pool&) = delete;
         thread_pool& operator = (const thread_pool&) = delete;

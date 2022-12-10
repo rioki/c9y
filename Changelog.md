@@ -9,16 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- fixed the situation where queue::pop would unlock a thread and it would instantly need to wait on mutex::lock
-- fixed 
+- fixed the situation where queue::pop would unlock a thread and it would instantly need to wait on mutex::lock 
 
 ### Changed
 
 - changed queue::pop, pop_wait and pop_wait_for return std::optional instead of taking a reference
+- changed constructor of thread_pool to accept any callable that a std::thread can take.
 
 ### Added
 
 - added queue::emplace to prevent copy of large objects
+- added thread_pool::request_stop to allow sopting on a std::stop_token.
 
 ### Removed
 

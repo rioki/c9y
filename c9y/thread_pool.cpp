@@ -23,30 +23,17 @@
 
 #include "thread_pool.h"
 
+#include <algorithm>
+#include <ranges>
+
 namespace c9y
 {
-    thread_pool::thread_pool() noexcept {}
-
-    thread_pool::thread_pool(std::function<void()> thread_func, size_t concurency)
+    #ifndef __cpp_lib_jthread
+    thread_pool::~thread_pool()
     {
-        for (size_t i = 0; i < concurency; i++)
-        {
-            threads.emplace_back(std::thread(thread_func));
-        }
+        join();
     }
-
-    thread_pool::thread_pool(thread_pool&& other) noexcept
-    {
-        swap(other);
-    }
-
-    thread_pool::~thread_pool() {}
-
-    thread_pool& thread_pool::operator = (thread_pool&& other) noexcept
-    {
-        swap(other);
-        return *this;
-    }
+    #endif
 
     size_t thread_pool::get_concurency() const
     {
@@ -57,13 +44,18 @@ namespace c9y
     {
         for (auto& thread : threads)
         {
-            thread.join();
+            if (thread.joinable()) {
+                thread.join();
+            }
         }
-        threads.clear();
     }
 
-    void thread_pool::swap(thread_pool& other) noexcept
+    #ifdef __cpp_lib_jthread
+    bool thread_pool::request_stop() noexcept
     {
-        threads.swap(other.threads);
+        return std::ranges::all_of(threads, [] (auto& thread) {
+            return thread.request_stop();
+        });
     }
+    #endif
 }

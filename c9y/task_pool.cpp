@@ -35,7 +35,6 @@ namespace c9y
     task_pool::~task_pool()
     {
         tasks.stop();
-        pool.join();
     }
 
     void task_pool::enqueue(const std::function<void ()>& func)

@@ -26,6 +26,8 @@
 #include <atomic>
 #include <gtest/gtest.h>
 
+using namespace std::chrono_literals;
+
 TEST(thread_pool, create)
 {
     auto count = std::atomic<unsigned int>{0};
@@ -33,6 +35,9 @@ TEST(thread_pool, create)
     auto pool = c9y::thread_pool{[&]() {
         count++;
     }, 2};
+
+    EXPECT_EQ(2, pool.get_concurency());
+
     pool.join();
 
     EXPECT_EQ(2, static_cast<unsigned int>(count));
@@ -41,6 +46,13 @@ TEST(thread_pool, create)
 TEST(thread_pool, default_contructor)
 {
     auto pool = c9y::thread_pool{};
+    EXPECT_EQ(0, pool.get_concurency());
+}
+
+TEST(thread_pool, default_concurency)
+{
+    auto pool = c9y::thread_pool{[&]() {}};
+    EXPECT_EQ(std::thread::hardware_concurrency(), pool.get_concurency());
 }
 
 TEST(thread_pool, move)
@@ -54,4 +66,21 @@ TEST(thread_pool, move)
     pool.join();
 
     EXPECT_EQ(2, static_cast<unsigned int>(count));
+}
+
+TEST(thread_pool, no_join)
+{
+    auto pool = c9y::thread_pool{[] {}};
+}
+
+TEST(thread_pool, stop_rquest)
+{
+    auto pool = c9y::thread_pool{[&] (std::stop_token st) {
+        while (!st.stop_requested())
+        {
+            std::this_thread::sleep_for(10ms);
+        }
+    }};
+
+    EXPECT_TRUE(pool.request_stop());
 }

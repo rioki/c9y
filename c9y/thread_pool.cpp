@@ -44,7 +44,9 @@ namespace c9y
     {
         for (auto& thread : threads)
         {
-            thread.join();
+            if (thread.joinable()) {
+                thread.join();
+            }
         }
     }
 

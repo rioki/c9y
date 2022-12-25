@@ -60,7 +60,7 @@ if(ENABLE_UNIT_TESTS)
     c9y-test/queue_test.cpp
     c9y-test/sync_test.cpp
     c9y-test/thread_pool_test.cpp
-    c9y-test/exception_test.h
+    c9y-test/exception_test.cpp
   )
   
   include_directories(.)

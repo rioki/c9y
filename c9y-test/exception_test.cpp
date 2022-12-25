@@ -98,13 +98,13 @@ TEST(exceptions, taks_pool)
     auto pool = c9y::task_pool(3);
 
     pool.enqueue([] () {
-        throw std::exception("one");
+        throw std::runtime_error("one");
     });
     pool.enqueue([] () {
-        throw std::exception("two");
+        throw std::runtime_error("two");
     });
     pool.enqueue([] () {
-        throw std::exception("three");
+        throw std::runtime_error("three");
     });
 
     pool.flush();

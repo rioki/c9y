@@ -188,31 +188,3 @@ TEST(sync, delay_once)
     c9y::sync_point();
     EXPECT_EQ(2u, count);
 }
-
-// NOTE: Don't get smart, death tests don't work over thread boundaries.
-
-TEST(sync, sync_throw_terminates)
-{
-    c9y::set_main_thread_id(std::this_thread::get_id());
-    c9y::sync(std::this_thread::get_id(), [&] () {
-        throw std::runtime_error("YOLO");
-    });
-    EXPECT_DEATH(c9y::sync_point(), "YOLO");
-}
-
-TEST(sync, sync_main_throw_terminates)
-{
-    c9y::set_main_thread_id(std::this_thread::get_id());
-    c9y::sync([&] () {
-        throw std::runtime_error("YOLO");
-    });
-    EXPECT_DEATH(c9y::sync_point(), "YOLO");
-}
-
-TEST(sync, delay_throw_terminates)
-{
-    c9y::delay([&] () {
-        throw std::runtime_error("YOLO");
-    });
-    EXPECT_DEATH(c9y::sync_point(), "YOLO");
-}

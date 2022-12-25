@@ -28,6 +28,9 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#include <format>
+
+#include "exceptions.h"
 
 namespace c9y
 {
@@ -44,6 +47,8 @@ namespace c9y
     {
         return main_thread_id;
     }
+
+
 
     void delay(const std::function<void()>& func) noexcept
     {
@@ -105,14 +110,9 @@ namespace c9y
             {
                 task();
             }
-            catch (const std::exception& ex)
-            {
-                std::cerr << ex.what() << std::endl;
-                std::terminate();
-            }
             catch (...)
             {
-                std::terminate();
+                unhandled_exception();
             }
         }
     }

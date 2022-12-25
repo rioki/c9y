@@ -27,8 +27,6 @@
 #include <mutex>
 #include <vector>
 #include <map>
-#include <iostream>
-#include <format>
 
 #include "exceptions.h"
 
@@ -47,8 +45,6 @@ namespace c9y
     {
         return main_thread_id;
     }
-
-
 
     void delay(const std::function<void()>& func) noexcept
     {

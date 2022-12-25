@@ -1,4 +1,3 @@
-//
 // c9y - concurrency
 // Copyright 2017-2022 Sean Farrell
 //
@@ -19,61 +18,38 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-//
 
-#include "task_pool.h"
+#ifndef _C9Y_EXCEPTIONS_H_
+#define _C9Y_EXCEPTIONS_H_
 
-#include "exceptions.h"
+#include <functional>
 
-using namespace std::literals::chrono_literals;
+#include "defines.h"
 
 namespace c9y
 {
-    task_pool::task_pool(size_t concurency) noexcept
-    : pool([this] () {thread_func();}, concurency) {}
+    //! Set the unhandled exception handler.
+    //!
+    //! Many functions in c9y can not safely propagate excpetions without
+    //! introducing data races. By default it will call std::termiante;
+    //! this may not be the desired behavior. You can install a handler
+    //! to customise the behavior, such as add logging and continue.
+    //!
+    //! @warning the handler may not throw an exception else std::termiante
+    //! will be called when it hits the next noexcept.
+    //!
+    //! @param handler the new handler
+    //! @return the previous handler
+    //!
+    //! @param id the thread id of the main thread.
+    C9Y_EXPORT std::function<void ()> set_unhandled_exception(const std::function<void ()>& handler) noexcept;
 
-    task_pool::~task_pool()
-    {
-        tasks.stop();
-        tasks_in_flight = 0; // needed to release flush
-        flush_cv.notify_all();
-    }
-
-    void task_pool::enqueue(const std::function<void ()>& func) noexcept
-    {
-        tasks_in_flight++;
-        tasks.push(func);
-    }
-
-    void task_pool::flush() noexcept
-    {
-        auto lock = std::unique_lock<std::mutex>{flush_mutex};
-
-        if (tasks_in_flight == 0)
-        {
-            return;
-        }
-
-        flush_cv.wait(lock, [&]{return tasks_in_flight == 0;});
-    }
-
-    void task_pool::thread_func() noexcept
-    {
-        while (auto task = tasks.pop_wait())
-        {
-            try
-            {
-                (*task)();
-            }
-            catch (...)
-            {
-                c9y::unhandled_exception();
-            }
-
-            if (--tasks_in_flight == 0)
-            {
-                flush_cv.notify_all();
-            }
-        }
-    }
+    //! React to an unhaled exception.
+    //!
+    //! In a catch block at the top of your call stack, where
+    //! you can't safly throw an exception, call unhandled_exception
+    //! and the unhandled exception handler will be called.
+    C9Y_EXPORT void unhandled_exception() noexcept;
 }
+
+#endif

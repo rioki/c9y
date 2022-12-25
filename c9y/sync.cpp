@@ -27,7 +27,8 @@
 #include <mutex>
 #include <vector>
 #include <map>
-#include <iostream>
+
+#include "exceptions.h"
 
 namespace c9y
 {
@@ -105,14 +106,9 @@ namespace c9y
             {
                 task();
             }
-            catch (const std::exception& ex)
-            {
-                std::cerr << ex.what() << std::endl;
-                std::terminate();
-            }
             catch (...)
             {
-                std::terminate();
+                unhandled_exception();
             }
         }
     }

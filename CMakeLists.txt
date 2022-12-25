@@ -26,6 +26,7 @@ set(HEADERS
   c9y/sync.h
   c9y/task_pool.h
   c9y/thread_pool.h
+  c9y/exceptions.h
 )
 
 set(SOURCES
@@ -35,6 +36,7 @@ set(SOURCES
   c9y/sync.cpp
   c9y/task_pool.cpp
   c9y/thread_pool.cpp
+  c9y/exceptions.cpp
 )
 
 # c9y library
@@ -58,6 +60,7 @@ if(ENABLE_UNIT_TESTS)
     c9y-test/queue_test.cpp
     c9y-test/sync_test.cpp
     c9y-test/thread_pool_test.cpp
+    c9y-test/exception_test.cpp
   )
   
   include_directories(.)

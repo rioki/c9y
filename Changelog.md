@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - added queue::emplace to prevent copy of large objects
 - added thread_pool::request_stop to allow sopting on a std::stop_token.
+- added configurable unhandled exception handing with set_unhandled_exception
 
 ### Removed
 

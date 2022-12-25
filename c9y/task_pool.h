@@ -48,11 +48,18 @@ namespace c9y
         ~task_pool();
 
         //! Add a task to the work queue.
-        void enqueue(const std::function<void ()>& func);
+        void enqueue(const std::function<void ()>& func) noexcept;
+
+        //! Wait for all pending work to clear.
+        void flush() noexcept;
 
     private:
         queue<std::function<void ()>> tasks;
         thread_pool                   pool;
+
+        std::atomic<unsigned int>     tasks_in_flight = 0;
+        std::mutex                    flush_mutex;
+        std::condition_variable       flush_cv;
 
         void thread_func() noexcept;
 

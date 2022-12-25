@@ -1,5 +1,5 @@
 // c9y - concurrency
-// Copyright(c) 2017-2022 Sean Farrell
+// Copyright 2017-2022 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -19,17 +19,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _C9Y_H_
-#define _C9Y_H_
-
-#include "defines.h"
-#include "thread_pool.h"
-#include "queue.h"
-#include "task_pool.h"
-#include "latch.h"
-#include "async.h"
-#include "sync.h"
-#include "parallel.h"
 #include "exceptions.h"
 
-#endif
+#include <cassert>
+#include <iostream>
+
+namespace c9y
+{
+    std::function<void ()> unhandled_exception_handler = [] () noexcept {
+        std::terminate();
+    };
+
+    std::function<void ()> set_unhandled_exception(const std::function<void ()>& handler) noexcept
+    {
+        assert(handler);
+        auto old = unhandled_exception_handler;
+        unhandled_exception_handler = handler;
+        return old;
+    }
+
+    void unhandled_exception() noexcept
+    {
+        assert(unhandled_exception_handler);
+        unhandled_exception_handler();
+    }
+}
+

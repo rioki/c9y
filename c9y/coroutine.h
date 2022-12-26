@@ -25,11 +25,11 @@
 #include "defines.h"
 
 #include <future>
-#include <coroutine>
-
 #include "async.h"
 
 #ifdef __cpp_lib_coroutine
+
+#include <coroutine>
 
 namespace c9y
 {

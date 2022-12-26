@@ -22,7 +22,7 @@
 //
 
 #include <chrono>
-#include <coroutine>
+
 #include <exception>
 #include <future>
 #include <iostream>
@@ -36,6 +36,7 @@
 #include <gtest/gtest.h>
 
 #ifdef __cpp_lib_coroutine
+#include <coroutine>
 
 std::future<int> compute_async() {
     using namespace c9y::co_async;

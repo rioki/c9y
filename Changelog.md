@@ -7,25 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-
-- fixed the situation where queue::pop would unlock a thread and it would instantly need to wait on mutex::lock
-- sync_fun now actually uses arguments tag and thread
-
-### Changed
-
-- changed queue::pop, pop_wait and pop_wait_for return std::optional instead of taking a reference
-- changed constructor of thread_pool to accept any callable that a std::thread can take.
-
 ### Added
 
 - added queue::emplace to prevent copy of large objects
 - added thread_pool::request_stop to allow sopting on a std::stop_token.
-- added configurable unhandled exception handing with set_unhandled_exception
+- added configurable unhandled exception handing with
+
+### Changed
+
+- changed queue::pop, pop_wait and pop_wait_for return std::optional instead of taking a reference
+- changed constructor of thread_pool to accept any callable that a std::thread can take
+- started to use std::latch
+
+### Deprecated
+
+- the c9y latch is being deprecated in favor of std::latch
+- latch::wait_for is not part of std::latch any code relying on it will break soon
 
 ### Removed
 
 - removed queue::wake and replaced it with queue::stop
+
+### Fixed
+
+- fixed the situation where queue::pop would unlock a thread and it would instantly need to wait on mutex::lock
+- sync_fun now actually uses arguments tag and thread
 
 ## [0.5.1] - 2022-12-04
 

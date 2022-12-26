@@ -47,6 +47,7 @@ TEST(latch, wait)
     EXPECT_EQ(12u, count);
 }
 
+#ifndef __cpp_lib_latch
 TEST(latch, wait_for)
 {
     auto my_latch = c9y::latch{12u};
@@ -63,3 +64,4 @@ TEST(latch, wait_for)
     while (!my_latch.wait_for(100ms)) {}
     EXPECT_EQ(12u, count);
 }
+#endif

@@ -94,8 +94,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Visual Studio build suport.
 
-### Fixed 
+### Fixed
+
 - properly implement 'dist' target for POSIX compliant installation
+- fixed the use of __cpp_lib_coroutine to properly expose coroutines.
 
 ## [0.2.1] - 2011-08-09
 

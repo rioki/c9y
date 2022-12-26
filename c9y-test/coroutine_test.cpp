@@ -21,10 +21,8 @@
 // SOFTWARE.
 //
 
-#ifdef __cpp_lib_coroutine
-
 #include <chrono>
-#include <coroutine>
+
 #include <exception>
 #include <future>
 #include <iostream>
@@ -36,6 +34,9 @@
 #include <c9y/coroutine.h>
 
 #include <gtest/gtest.h>
+
+#ifdef __cpp_lib_coroutine
+#include <coroutine>
 
 std::future<int> compute_async() {
     using namespace c9y::co_async;
@@ -74,8 +75,6 @@ TEST(coroutine, compute_sync)
 
     EXPECT_EQ(6 * 7, f.get());
 }
-
-
 TEST(coroutine, fail)
 {
     EXPECT_THROW(fail().get(), std::runtime_error);

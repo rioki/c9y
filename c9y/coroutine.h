@@ -22,14 +22,14 @@
 #ifndef _C9Y_COROUTINE_H_
 #define _C9Y_COROUTINE_H_
 
-#ifdef __cpp_lib_coroutine
-
 #include "defines.h"
 
 #include <future>
-#include <coroutine>
-
 #include "async.h"
+
+#ifdef __cpp_lib_coroutine
+
+#include <coroutine>
 
 namespace c9y
 {

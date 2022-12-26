@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2022-12-26
+
 ### Added
 
 - added queue::emplace to prevent copy of large objects
@@ -130,8 +132,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - condition class
 - lock class
 
-[Unreleased]: https://github.com/rioki/c9y/compare/v0.5.1...master
+[Unreleased]: https://github.com/rioki/c9y/compare/v0.6.0...master
 
+[0.6.0]: https://github.com/rioki/c9y/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/rioki/c9y/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/rioki/c9y/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/rioki/c9y/compare/v0.3.0...v0.4.0

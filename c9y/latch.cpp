@@ -23,7 +23,7 @@
 
 #include "latch.h"
 
-#ifndef __cpp_lib_latch
+#ifndef C9Y_USE_STD_LATCH
 
 #include <cassert>
 namespace c9y

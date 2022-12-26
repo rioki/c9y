@@ -29,6 +29,8 @@
 
 #include "async.h"
 
+#ifdef __cpp_lib_coroutine
+
 namespace c9y
 {
     template <typename T, typename ... Args>
@@ -160,4 +162,5 @@ namespace c9y
     }
 }
 
+#endif
 #endif

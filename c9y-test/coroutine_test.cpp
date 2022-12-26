@@ -35,6 +35,8 @@
 
 #include <gtest/gtest.h>
 
+#ifdef __cpp_lib_coroutine
+
 std::future<int> compute_async() {
     using namespace c9y::co_async;
     int a = co_await c9y::async<int>([] { return 6; });
@@ -76,3 +78,5 @@ TEST(coroutine, fail)
 {
     EXPECT_THROW(fail().get(), std::runtime_error);
 }
+
+#endif

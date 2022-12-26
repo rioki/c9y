@@ -189,6 +189,10 @@ TEST(sync, delay_once)
     EXPECT_EQ(2u, count);
 }
 
+#ifndef __cpp_lib_jthread
+// This also works without jthread; but I can't be bothered
+// to reqwrite these tests for the neanderthals.
+
 TEST(sync, sync_fun_main_thread)
 {
     c9y::set_main_thread_id(std::this_thread::get_id());
@@ -296,3 +300,5 @@ TEST(sync, sync_fun_once_different_thread)
 
     EXPECT_EQ(1u, count);
 }
+
+#endif

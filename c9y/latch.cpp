@@ -23,8 +23,9 @@
 
 #include "latch.h"
 
-#include <cassert>
+#ifndef __cpp_lib_latch
 
+#include <cassert>
 namespace c9y
 {
     std::ptrdiff_t latch::max() noexcept
@@ -52,3 +53,4 @@ namespace c9y
         assert(count <= 0);
     }
 }
+#endif

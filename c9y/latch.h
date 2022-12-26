@@ -25,6 +25,10 @@
 #include "defines.h"
 
 #include <cstddef>
+
+#ifdef __cpp_lib_latch
+#include <latch>
+#else
 #include <mutex>
 #include <condition_variable>
 #include <chrono>
@@ -33,9 +37,15 @@
 #warning "Undefined max. Defining the max macro will result in a compile error."
 #undef max
 #endif
+#endif
+
 
 namespace c9y
 {
+    #ifdef __cpp_lib_latch
+    using latch = std::latch;
+    #else
+
     //! latch
     //!
     //! The latch class is a downward counter of type ptrdiff_t which can be used to synchronize threads.
@@ -64,7 +74,7 @@ namespace c9y
         //!
         //! This function may spuriously return false with very low probability even if the internal counter has reached zero.
         template<class Rep, class Period>
-        [[nodiscard]] bool wait_for(const std::chrono::duration<Rep, Period>& duration) const
+        [[deprecated]] [[nodiscard]] bool wait_for(const std::chrono::duration<Rep, Period>& duration) const
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
             cond.wait_for(lock, duration, [&]{return count == 0;});
@@ -82,6 +92,7 @@ namespace c9y
         latch(const latch&) = delete;
         latch& operator = (const latch&) = delete;
     };
+    #endif
 }
 
 #endif

@@ -189,7 +189,7 @@ TEST(sync, delay_once)
     EXPECT_EQ(2u, count);
 }
 
-#ifndef __cpp_lib_jthread
+#ifdef __cpp_lib_jthread
 // This also works without jthread; but I can't be bothered
 // to reqwrite these tests for the neanderthals.
 

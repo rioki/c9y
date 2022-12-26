@@ -82,8 +82,16 @@ namespace c9y
         if (tag.active.exchange(true) == false)
         {
             sync(thread, [&tag, func]() {
-                tag.active = false;
-                func();
+                try
+                {
+                    func();
+                    tag.active = false;
+                }
+                catch (...)
+                {
+                    tag.active = false;
+                    throw;
+                }
             });
         }
     }

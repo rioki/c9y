@@ -188,3 +188,115 @@ TEST(sync, delay_once)
     c9y::sync_point();
     EXPECT_EQ(2u, count);
 }
+
+TEST(sync, sync_fun_main_thread)
+{
+    c9y::set_main_thread_id(std::this_thread::get_id());
+
+    auto count = 0u;
+    auto func  = c9y::sync_fun([&] () {
+        count++;
+    });
+
+    auto done = false;
+    auto worker = std::jthread([&] () {
+        func();
+        func();
+        func();
+        c9y::sync([&] () {
+            done = true;
+        });
+    });
+
+    while (!done)
+    {
+        c9y::sync_point();
+    }
+
+    EXPECT_EQ(3u, count);
+}
+
+TEST(sync, sync_fun_different_thread)
+{
+    auto consumer = std::jthread([&] (std::stop_token st) {
+        while (!st.stop_requested())
+        {
+            c9y::sync_point();
+        }
+    });
+
+    auto count = 0u;
+    auto func  = c9y::sync_fun(consumer.get_id(), [&] () {
+        count++;
+    });
+
+    auto producer = std::jthread([&] () {
+        func();
+        func();
+        func();
+    });
+
+    producer.join();
+    consumer.request_stop();
+    consumer.join();
+
+    EXPECT_EQ(3u, count);
+}
+
+TEST(sync, sync_fun_once_main_thread)
+{
+    c9y::set_main_thread_id(std::this_thread::get_id());
+
+    auto ot    = c9y::once_tag{};
+    auto count = 0u;
+    auto func  = c9y::sync_fun(ot, [&] () {
+        count++;
+    });
+
+    auto done = false;
+    auto worker = std::jthread([&] () {
+        func();
+        func();
+        func();
+        c9y::sync([&] () {
+            done = true;
+        });
+    });
+
+    while (!done)
+    {
+        c9y::sync_point();
+    }
+
+    EXPECT_EQ(1u, count);
+}
+
+TEST(sync, sync_fun_once_different_thread)
+{
+    auto consumer = std::jthread([&] (std::stop_token st) {
+        std::this_thread::sleep_for(50ms); // let some time pass so all work is injected.
+        do
+        {
+            c9y::sync_point();
+        }
+        while (!st.stop_requested());
+    });
+
+    auto ot    = c9y::once_tag{};
+    auto count = 0u;
+    auto func  = c9y::sync_fun(ot, consumer.get_id(), [&] () {
+        count++;
+    });
+
+    auto producer = std::jthread([&] () {
+        func();
+        func();
+        func();
+    });
+
+    producer.join();
+    consumer.request_stop();
+    consumer.join();
+
+    EXPECT_EQ(1u, count);
+}

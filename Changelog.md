@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- fixed the situation where queue::pop would unlock a thread and it would instantly need to wait on mutex::lock 
+- fixed the situation where queue::pop would unlock a thread and it would instantly need to wait on mutex::lock
+- sync_fun now actually uses arguments tag and thread
 
 ### Changed
 

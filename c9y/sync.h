@@ -207,20 +207,20 @@ namespace c9y
     }
     [[nodiscard]] inline std::function<void ()> sync_fun(const std::thread::id& thread, const std::function<void ()>& func) noexcept
     {
-        return [func] () {
-            sync(func);
+        return [thread, func] () {
+            sync(thread, func);
         };
     }
     [[nodiscard]] inline std::function<void ()> sync_fun(once_tag& tag, const std::function<void ()>& func) noexcept
     {
-        return [func] () {
-            sync(func);
+        return [&tag, func] () {
+            sync(tag, func);
         };
     }
     [[nodiscard]] inline std::function<void ()> sync_fun(once_tag& tag,  const std::thread::id& thread, const std::function<void ()>& func) noexcept
     {
-        return [func] () {
-            sync(func);
+        return [&tag, thread, func] () {
+            sync(tag, thread, func);
         };
     }
     //! @}

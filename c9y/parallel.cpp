@@ -32,6 +32,4 @@ namespace c9y
         static task_pool pool(std::thread::hardware_concurrency());
         return pool;
     }
-
-
 }

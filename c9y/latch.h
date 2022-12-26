@@ -26,7 +26,11 @@
 
 #include <cstddef>
 
-#ifdef __cpp_lib_latch
+#if defined __cpp_lib_latch && defined _MSC_VER
+#define C9Y_USE_STD_LATCH 1
+#endif
+
+#ifdef C9Y_USE_STD_LATCH
 #include <latch>
 #else
 #include <mutex>
@@ -42,7 +46,7 @@
 
 namespace c9y
 {
-    #ifdef __cpp_lib_latch
+    #ifdef C9Y_USE_STD_LATCH
     using latch = std::latch;
     #else
 

@@ -24,7 +24,9 @@
 #include "thread_pool.h"
 
 #include <algorithm>
+#ifdef __cpp_lib_jthread
 #include <ranges>
+#endif
 
 namespace c9y
 {

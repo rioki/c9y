@@ -258,15 +258,11 @@ TEST(sync, sync_fun_once_main_thread)
         func();
         func();
         func();
-        c9y::sync([&] () {
-            done = true;
-        });
     });
 
-    while (!done)
-    {
-        c9y::sync_point();
-    }
+    worker.join();
+
+    c9y::sync_point();
 
     EXPECT_EQ(1u, count);
 }

@@ -70,7 +70,7 @@ namespace c9y
         //! @param value the value to push onto the queue
         //!
         //! @{
-        void push(const value_type& value)
+        void push(const value_type& value) noexcept(std::is_nothrow_copy_constructible_v<value_type>)
         {
             {
                 auto lock = std::unique_lock<std::mutex>{mutex};
@@ -79,11 +79,12 @@ namespace c9y
             cond.notify_one();
         }
 
-        void emplace(value_type&& value)
+        template<typename... Args>
+        void emplace(Args&&... args) noexcept(std::is_nothrow_constructible_v<value_type, Args...>)
         {
             {
                 auto lock = std::unique_lock<std::mutex>{mutex};
-                container.emplace_back(std::move(value));
+                container.emplace_back(std::forward<Args>(args)...);
             }
             cond.notify_one();
         }
@@ -96,7 +97,7 @@ namespace c9y
         //!
         //! @param value the value of the pop
         //! @return true if a value was poped of the queue
-        [[nodiscard]] std::optional<value_type> pop()
+        [[nodiscard]] std::optional<value_type> pop() noexcept
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
             if (!container.empty())
@@ -123,7 +124,7 @@ namespace c9y
         //! @warning It is quite simple to build a race condition with pop_wait
         //! and wake. If you intend to reliably wake all waiting threads, use
         //! pop_wait_for with a reasonable timeout.
-        [[nodiscard]] std::optional<value_type> pop_wait()
+        [[nodiscard]] std::optional<value_type> pop_wait() noexcept
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
             cond.wait(lock, [&]{return !container.empty() || stopped;});
@@ -148,7 +149,7 @@ namespace c9y
         //! @param duration the duration to wait for
         //! @return true if a value was poped of the queue
         template<class Rep, class Period>
-        [[nodiscard]] std::optional<value_type> pop_wait_for(const std::chrono::duration<Rep, Period>& duration)
+        [[nodiscard]] std::optional<value_type> pop_wait_for(const std::chrono::duration<Rep, Period>& duration) noexcept
         {
             auto lock = std::unique_lock<std::mutex>{mutex};
             cond.wait_for(lock, duration, [&]{return !container.empty() || stopped;});
@@ -167,7 +168,7 @@ namespace c9y
         //!
         //! This function should be called before destructing the queue and ensure
         //! a clean exit can be done.
-        void stop()
+        void stop() noexcept
         {
             {
                 auto lock = std::unique_lock<std::mutex>{mutex};

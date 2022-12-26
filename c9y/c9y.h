@@ -23,13 +23,14 @@
 #define _C9Y_H_
 
 #include "defines.h"
-#include "thread_pool.h"
-#include "queue.h"
-#include "task_pool.h"
-#include "latch.h"
 #include "async.h"
-#include "sync.h"
-#include "parallel.h"
+#include "coroutine.h"
 #include "exceptions.h"
+#include "latch.h"
+#include "parallel.h"
+#include "queue.h"
+#include "sync.h"
+#include "task_pool.h"
+#include "thread_pool.h"
 
 #endif

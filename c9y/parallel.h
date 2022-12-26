@@ -46,7 +46,7 @@ namespace c9y
 
     C9Y_EXPORT [[nodiscard]] task_pool& _get_parallel_pool() noexcept;
 
-     [[nodiscard]] constexpr size_t _get_results_size(const size_t size, const size_t chunk_size)
+    [[nodiscard]] constexpr size_t _get_results_size(const size_t size, const size_t chunk_size)
     {
         if (size % chunk_size == 0)
         {

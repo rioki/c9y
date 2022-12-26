@@ -24,12 +24,15 @@
 
 #include "defines.h"
 
-#include <future>
-#include "async.h"
+#include <cstddef>
 
 #ifdef __cpp_lib_coroutine
 
+#include <future>
 #include <coroutine>
+
+#include "async.h"
+#include "sync.h"
 
 namespace c9y
 {

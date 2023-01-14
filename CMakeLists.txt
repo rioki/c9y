@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.8)
 project(c9y CXX)
 
-set(PROJECT_VERSION 0.6.0)
+set(PROJECT_VERSION 0.6.1)
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 6)
-set(PROJECT_VERSION_PATCH 0)
+set(PROJECT_VERSION_PATCH 1)
 
 option(ENABLE_UNIT_TESTS "Enable building unit tests." OFF)
 
@@ -80,7 +80,7 @@ install(
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
-  PUBLIC_HEADER DESTINATION include/rioki/c9y
+  PUBLIC_HEADER DESTINATION include/c9y
 )
 
 include(CMakePackageConfigHelpers)

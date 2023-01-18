@@ -19,9 +19,6 @@ set(HEADERS
   c9y/task_pool.h
   c9y/thread_pool.h
 )
-set(HEADERS_DIR
-  .
-)
 
 # library
 add_library(c9y   
@@ -35,7 +32,7 @@ add_library(c9y
 )
 target_include_directories(c9y SYSTEM INTERFACE 
   "$<BUILD_INTERFACE:${c9y_SOURCE_DIR}>"
-  "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDEDIR}>"
+  "$<INSTALL_INTERFACE:include>"
 )
 target_compile_features(c9y PRIVATE cxx_std_20)
 set_target_properties(c9y PROPERTIES

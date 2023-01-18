@@ -32,7 +32,7 @@ add_library(c9y
 )
 target_include_directories(c9y SYSTEM INTERFACE 
   "$<BUILD_INTERFACE:${c9y_SOURCE_DIR}>"
-  "$<INSTALL_INTERFACE:include>"
+  "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>"
 )
 target_compile_features(c9y PRIVATE cxx_std_20)
 set_target_properties(c9y PROPERTIES

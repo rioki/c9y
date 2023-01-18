@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2023-01-18
+
 ### Added
 
-- added pkgconfig suport
+- added pkgconfig support
 
 ### Fixed
 
@@ -146,8 +148,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - condition class
 - lock class
 
-[Unreleased]: https://github.com/rioki/c9y/compare/v0.6.1...master
+[Unreleased]: https://github.com/rioki/c9y/compare/v0.6.2...master
 
+[0.6.2]: https://github.com/rioki/c9y/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/rioki/c9y/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/rioki/c9y/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/rioki/c9y/compare/v0.5.0...v0.5.1

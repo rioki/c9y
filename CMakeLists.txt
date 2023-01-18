@@ -21,7 +21,7 @@ target_compile_features(c9y PRIVATE cxx_std_20)
 
 # unit tests
 if(ENABLE_UNIT_TESTS)
-find_package(GTest CONFIG REQUIRED)
+  find_package(GTest CONFIG REQUIRED)
   add_executable(c9y-test   
     c9y-test/async_test.cpp
     c9y-test/coroutine_test.cpp
@@ -60,13 +60,13 @@ write_basic_package_version_file(
 install(EXPORT c9yTargets
         FILE c9yTargets.cmake
         NAMESPACE c9y::
-        DESTINATION lib/cmake/c9y
+        DESTINATION share/cmake/c9y
 )
 
 configure_file(c9yConfig.cmake.in c9yConfig.cmake @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/c9yConfig.cmake"
               "${CMAKE_CURRENT_BINARY_DIR}/c9yConfigVersion.cmake"
-        DESTINATION lib/cmake/c9y
+        DESTINATION share/cmake/c9y
 )
 
 export(TARGETS c9y 

@@ -97,3 +97,7 @@ export(TARGETS c9y
 
 set(CMAKE_EXPORT_PACKAGE_REGISTRY ON)
 export(PACKAGE c9y)
+
+configure_file("${PROJECT_SOURCE_DIR}/c9y.pc.in" "${CMAKE_CURRENT_BINARY_DIR}/c9y.pc" @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/c9y.pc"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")

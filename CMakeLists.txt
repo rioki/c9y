@@ -7,6 +7,19 @@ project(c9y
 
 option(ENABLE_UNIT_TESTS "Enable building unit tests." OFF)
 
+set(HEADERS
+  c9y/async.h
+  c9y/c9y.h
+  c9y/coroutine.h
+  c9y/defines.h
+  c9y/latch.h
+  c9y/parallel.h
+  c9y/queue.h
+  c9y/sync.h
+  c9y/task_pool.h
+  c9y/thread_pool.h
+)
+
 # library
 add_library(c9y   
   c9y/async.cpp
@@ -18,6 +31,11 @@ add_library(c9y
   c9y/exceptions.cpp
 )
 target_compile_features(c9y PRIVATE cxx_std_20)
+set_target_properties(c9y PROPERTIES
+    CXX_STANDARD 20
+    PUBLIC_HEADER "${HEADERS}"
+)
+
 
 # unit tests
 if(ENABLE_UNIT_TESTS)
@@ -35,6 +53,9 @@ if(ENABLE_UNIT_TESTS)
   )
   include_directories(.)
   target_compile_features(c9y-test PRIVATE cxx_std_20)
+  set_target_properties(c9y PROPERTIES
+      CXX_STANDARD 20
+  )
   target_link_libraries(c9y-test PRIVATE c9y GTest::gtest)
   add_test(NAME c9y-test 
            COMMAND c9y-test
@@ -47,7 +68,7 @@ install(TARGETS c9y
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
-        INCLUDES DESTINATION include
+        PUBLIC_HEADER DESTINATION include/c9y
 )
 
 include(CMakePackageConfigHelpers)

@@ -1,0 +1,10 @@
+prefix="@CMAKE_INSTALL_PREFIX@"
+libdir="${prefix}/lib"
+includedir="${prefix}/include"
+
+Name: c9y
+Description: Concurency
+Version: @PROJECT_VERSION@
+URL: https://github.com/rioki/c9y/
+Libs: -L${libdir} -c9y
+Cflags: -I${includedir}

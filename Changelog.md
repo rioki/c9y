@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- added pkgconfig suport
+
+### Fixed
+
+- fixed CMake packaging.
+
 ## [0.6.1] - 2023-01-14
 
 ### Fixed

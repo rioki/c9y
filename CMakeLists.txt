@@ -81,13 +81,13 @@ write_basic_package_version_file(
 install(EXPORT c9yTargets
         FILE c9yTargets.cmake
         NAMESPACE c9y::
-        DESTINATION share/cmake/c9y
+        DESTINATION lib/cmake/c9y
 )
 
 configure_file(c9yConfig.cmake.in c9yConfig.cmake @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/c9yConfig.cmake"
               "${CMAKE_CURRENT_BINARY_DIR}/c9yConfigVersion.cmake"
-        DESTINATION share/cmake/c9y
+        DESTINATION lib/cmake/c9y
 )
 
 export(TARGETS c9y 

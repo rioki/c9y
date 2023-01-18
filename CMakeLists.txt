@@ -1,35 +1,14 @@
-cmake_minimum_required(VERSION 3.8)
-project(c9y CXX)
-
-set(PROJECT_VERSION 0.6.1)
-set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 6)
-set(PROJECT_VERSION_PATCH 1)
+cmake_minimum_required(VERSION 3.15)
+project(c9y
+        VERSION 0.6.2
+        DESCRIPTION "Concurency"
+        LANGUAGES CXX
+)
 
 option(ENABLE_UNIT_TESTS "Enable building unit tests." OFF)
 
-set(CMAKE_SHARED_LIBRARY_PREFIX)
-set(CMAKE_STATIC_LIBRARY_PREFIX)
-
-if(ENABLE_UNIT_TESTS)
-  find_package(GTest CONFIG REQUIRED)
-endif()
-
-set(HEADERS
-  c9y/async.h
-  c9y/c9y.h
-  c9y/coroutine.h
-  c9y/defines.h
-  c9y/latch.h
-  c9y/parallel.h
-  c9y/queue.h
-  c9y/sync.h
-  c9y/task_pool.h
-  c9y/thread_pool.h
-  c9y/exceptions.h
-)
-
-set(SOURCES
+# library
+add_library(c9y   
   c9y/async.cpp
   c9y/latch.cpp
   c9y/parallel.cpp
@@ -38,20 +17,12 @@ set(SOURCES
   c9y/thread_pool.cpp
   c9y/exceptions.cpp
 )
+target_compile_features(c9y PRIVATE cxx_std_20)
 
-# c9y library
-add_library(c9y ${SOURCES})
-set_target_properties(c9y PROPERTIES
-    CXX_STANDARD 20
-    PUBLIC_HEADER "${HEADERS}"
-)
-
-# c9y-test 
+# unit tests
 if(ENABLE_UNIT_TESTS)
-
-  enable_testing()
-
-  set(TEST_SOURCES
+find_package(GTest CONFIG REQUIRED)
+  add_executable(c9y-test   
     c9y-test/async_test.cpp
     c9y-test/coroutine_test.cpp
     c9y-test/latch_test.cpp
@@ -62,42 +33,46 @@ if(ENABLE_UNIT_TESTS)
     c9y-test/thread_pool_test.cpp
     c9y-test/exception_test.cpp
   )
-  
   include_directories(.)
-  add_executable(c9y-test ${TEST_SOURCES})
-  set_target_properties(c9y-test PROPERTIES
-    CXX_STANDARD 20
-  )
+  target_compile_features(c9y-test PRIVATE cxx_std_20)
   target_link_libraries(c9y-test PRIVATE c9y GTest::gtest)
-  add_test(c9y-test c9y-test)
-
+  add_test(NAME c9y-test 
+           COMMAND c9y-test
+  )
 endif()
 
 # install
-install(
-  TARGETS c9y
-  EXPORT c9yTargets
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  PUBLIC_HEADER DESTINATION include/c9y
+install(TARGETS c9y 
+        EXPORT c9yTargets
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
 )
 
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file("${PROJECT_BINARY_DIR}/c9yConfigVersion.cmake"
-                                 COMPATIBILITY SameMajorVersion)
-
-configure_package_config_file(${PROJECT_SOURCE_DIR}/c9yConfig.cmake.in
-                                c9yConfig.cmake
-                                INSTALL_DESTINATION share/c9y)
-
-install(FILES
-        "${PROJECT_BINARY_DIR}/c9yConfig.cmake"
-        "${PROJECT_BINARY_DIR}/c9yConfigVersion.cmake"
-        DESTINATION share/c9y
+write_basic_package_version_file(
+    c9yConfigVersion.cmake
+    VERSION ${PACKAGE_VERSION}
+    COMPATIBILITY AnyNewerVersion
 )
 
 install(EXPORT c9yTargets
+        FILE c9yTargets.cmake
         NAMESPACE c9y::
-        DESTINATION share/c9y
+        DESTINATION lib/cmake/c9y
 )
+
+configure_file(c9yConfig.cmake.in c9yConfig.cmake @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/c9yConfig.cmake"
+              "${CMAKE_CURRENT_BINARY_DIR}/c9yConfigVersion.cmake"
+        DESTINATION lib/cmake/c9y
+)
+
+export(TARGETS c9y 
+       NAMESPACE c9y:: 
+       FILE c9yTargets.cmake
+)
+
+set(CMAKE_EXPORT_PACKAGE_REGISTRY ON)
+export(PACKAGE c9y)

@@ -1,5 +1,5 @@
 // c9y - concurrency
-// Copyright(c) 2017-2022 Sean Farrell
+// Copyright 2017-2022 Sean Farrell
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
@@ -19,20 +19,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _C9Y_H_
-#define _C9Y_H_
-
+#pragma once
 #include "defines.h"
-#include "async.h"
-#include "coroutine.h"
-#include "exceptions.h"
-#include "latch.h"
-#include "parallel.h"
-#include "queue.h"
-#include "sync.h"
-#include "task_pool.h"
-#include "thread_pool.h"
-#include "utils.h"
 
+namespace c9y
+{
+    //! Check if all waitable items are ready.
+    //!
+    //!
+    template <typename T>
+    bool all_ready(T& items) noexcept
+    {
+        for (const auto& item : items)
+        {
+            if (item.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
-#endif
+    //! Wait for all waitable items.
+    template <typename T>
+    void wait_all(T& items) noexcept
+    {
+        for (const auto& item : items)
+        {
+            item.wait();
+        }
+    }
+}

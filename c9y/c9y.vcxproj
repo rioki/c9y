@@ -170,6 +170,7 @@
     <ClInclude Include="sync.h" />
     <ClInclude Include="task_pool.h" />
     <ClInclude Include="thread_pool.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="async.cpp" />

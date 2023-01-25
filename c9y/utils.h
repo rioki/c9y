@@ -24,6 +24,9 @@
 
 namespace c9y
 {
+    //! Check if all waitable items are ready.
+    //!
+    //!
     template <typename T>
     bool all_ready(T& items) noexcept
     {
@@ -37,6 +40,7 @@ namespace c9y
         return true;
     }
 
+    //! Wait for all waitable items.
     template <typename T>
     void wait_all(T& items) noexcept
     {

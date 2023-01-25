@@ -121,6 +121,7 @@ namespace atomic
         {
             state = State::THINKING;
             print();
+            health -= duration / 3;
             std::this_thread::sleep_for(std::chrono::milliseconds(duration));
         }
 
@@ -173,7 +174,7 @@ auto get_random_seed()
     return rd();
 }
 
-TEST(philosophers, NOCI_atomics)
+TEST(philosophers, atomics)
 {
     using namespace atomic;
 
@@ -190,8 +191,8 @@ TEST(philosophers, NOCI_atomics)
         try
         {
             std::mt19937 gen(get_random_seed());
-            std::uniform_int_distribution<> thinking_dist(10, 100);
-            std::uniform_int_distribution<> eating_dist(1, 25);
+            std::uniform_int_distribution<> thinking_dist(1, 25);
+            std::uniform_int_distribution<> eating_dist(25, 50);
 
             auto id = last_id++;
             ASSERT_LT(id, philosophers.size());
@@ -224,7 +225,7 @@ TEST(philosophers, NOCI_atomics)
     }
 }
 
-TEST(philosophers, NOCI_async_and_sync)
+TEST(philosophers, async_and_sync)
 {
     c9y::set_main_thread_id(std::this_thread::get_id());
 
@@ -271,7 +272,7 @@ TEST(philosophers, NOCI_async_and_sync)
         {
             auto ammount = thinking_dist(gen);
             phil.state = State::THINKING;
-            phil.health -= ammount / 2;
+            phil.health -= ammount / 3;
             return std::chrono::milliseconds(ammount);
         });
         print(phil);
@@ -292,7 +293,7 @@ TEST(philosophers, NOCI_async_and_sync)
                 phil.satiation += ammount;
                 left_fork.available  = false;
                 right_fork.available = false;
-                return std::chrono::milliseconds(thinking_dist(gen));
+                return std::chrono::milliseconds(eating_dist(gen));
             }
             return std::chrono::milliseconds(0);
         });

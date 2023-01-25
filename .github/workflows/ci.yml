@@ -1,4 +1,4 @@
-name: CMake
+name: CI
 
 on:
   push:
@@ -36,7 +36,52 @@ jobs:
               core.setFailed(`${basename} is missing in CMakeLists.txt`);
             }
           }
-  build:
+  msbuild:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x86, x64]
+        config: [Debug, Release]
+        include:
+          - platform: x86
+            triplet: x86-windows
+          - platform: x64
+            triplet: x64-windows
+    runs-on: windows-latest
+    env:
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+    - name: Restore from cache and install vcpkg
+      uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
+        appendedCacheKey: ${{ matrix.triplet }}
+    - name: 'Setup NuGet/Vcpkg Credentials'
+      shell: 'bash'
+      run: >
+        `./vcpkg/vcpkg fetch nuget | tail -n 1` \
+          sources add \
+          -source "https://nuget.pkg.github.com/rioki/index.json" \
+          -storepasswordincleartext \
+          -name "GitHub" \
+          -username "rioki" \
+          -password "${{ secrets.GITHUB_TOKEN }}"
+        `./vcpkg/vcpkg fetch nuget | tail -n 1` \
+          setapikey "${{ secrets.GITHUB_TOKEN }}" \
+          -source "https://nuget.pkg.github.com/rioki/index.json"
+    - name: Integrate vcpkg in MSBuild
+      shell: 'bash'
+      run: vcpkg.exe integrate install
+    - name: Build
+      run: msbuild /m /p:Configuration=${{matrix.config}} /property:Platform=${{matrix.platform}} c9y.sln
+    - name: Test
+      continue-on-error: true
+      run: ${{matrix.platform}}/${{matrix.config}}/c9y-test.exe
+  cmake:
     strategy:
       fail-fast: false
       matrix:

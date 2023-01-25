@@ -16,6 +16,25 @@ env:
   CTEST_OUTPUT_ON_FAILURE: 1
 
 jobs:
+  check:
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Check CMake 
+      uses: actions/github-script@v6
+      with:
+        script: |
+          let path = require('path');
+          let fs = require('fs').promises;
+          let patterns = ['**/c9y/*.cpp', '**/c9y-test/*.cpp', '**/c9y/*.h'];
+          let globber = await glob.create(patterns.join('\n'));
+          let cmakeContents = await fs.readFile('CMakeLists.txt', 'utf-8');
+          for await (let file of globber.globGenerator()) {
+            let basename = path.basename(file);
+            if (cmakeContents.search(basename) == -1) {
+              core.setFailed(`${basename} is missing in CMakeLists.txt`);
+            }
+          }
   build:
     strategy:
       fail-fast: false
@@ -60,21 +79,6 @@ jobs:
         ${{ matrix.mono }} `./vcpkg/vcpkg fetch nuget | tail -n 1` \
           setapikey "${{ secrets.GITHUB_TOKEN }}" \
           -source "https://nuget.pkg.github.com/rioki/index.json"
-    - name: Check CMake 
-      uses: actions/github-script@v6
-      with:
-        script: |
-          let path = require('path');
-          let fs = require('fs').promises;
-          let patterns = ['**/c9y/*.cpp', '**/c9y-test/*.cpp', '**/c9y/*.h'];
-          let globber = await glob.create(patterns.join('\n'));
-          let cmakeContents = await fs.readFile('CMakeLists.txt', 'utf-8');
-          for await (let file of globber.globGenerator()) {
-            let basename = path.basename(file);
-            if (cmakeContents.search(basename) == -1) {
-              core.setFailed(`${basename} is missing in CMakeLists.txt`);
-            }
-          }
     - name: Build
       uses: lukka/run-cmake@v10
       with:

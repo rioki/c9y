@@ -69,16 +69,11 @@ jobs:
           let patterns = ['**/c9y/*.cpp', '**/c9y-test/*.cpp', '**/c9y/*.h'];
           let globber = await glob.create(patterns.join('\n'));
           let cmakeContents = await fs.readFile('CMakeLists.txt', 'utf-8');
-          let missingFiles = false;
           for await (let file of globber.globGenerator()) {
             let basename = path.basename(file);
             if (cmakeContents.search(basename) == -1) {
-              core.error(`${basename} is missing in CMakeLists.txt`, 'CmakeLists.txt');
-              missingFiles = true;
+              core.setFailed(`${basename} is missing in CMakeLists.txt`);
             }
-          }
-          if (missingFiles) {
-            core.setFailed('CMakeLists.txt has missing files.');
           }
     - name: Build
       uses: lukka/run-cmake@v10

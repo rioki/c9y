@@ -64,10 +64,16 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          let patterns = ['**/*.cpp', '**/*.h'];
+          let path = require('path');
+          let fs = require('fs').promises;
+          let patterns = ['**/c9y/*.cpp', '**/c9y-test/*.cpp', '**/c9y/*.h'];
           let globber = await glob.create(patterns.join('\n'));
-          for await (const file of globber.globGenerator()) {
-            console.log(file);
+          let cmakeContents = await fs.readFile('CMakeLists.txt', 'utf-8');
+          for await (let file of globber.globGenerator()) {
+            let basename = path.basename(file);
+            if (cmakeContents.search(basename) == -1) {
+              core.error(`${basename} is missing in CMakeLists.txt`, 'CmakeLists.txt');
+            }
           }
     - name: Build
       uses: lukka/run-cmake@v10

@@ -60,6 +60,15 @@ jobs:
         ${{ matrix.mono }} `./vcpkg/vcpkg fetch nuget | tail -n 1` \
           setapikey "${{ secrets.GITHUB_TOKEN }}" \
           -source "https://nuget.pkg.github.com/rioki/index.json"
+    - name: Check CMake 
+      uses: actions/github-script@v6
+      with:
+        script: |
+          let patterns = ['**/cpp', '**/.h'];
+          let globber = await glob.create(patterns.join('\n'));
+          for await (const file of globber.globGenerator()) {
+            console.log(file);
+          }
     - name: Build
       uses: lukka/run-cmake@v10
       with:

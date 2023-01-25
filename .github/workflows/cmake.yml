@@ -64,7 +64,7 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          let patterns = ['**/cpp', '**/.h'];
+          let patterns = ['**/*.cpp', '**/*.h'];
           let globber = await glob.create(patterns.join('\n'));
           for await (const file of globber.globGenerator()) {
             console.log(file);

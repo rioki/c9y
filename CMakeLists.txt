@@ -12,12 +12,14 @@ set(HEADERS
   c9y/c9y.h
   c9y/coroutine.h
   c9y/defines.h
+  c9y/exceptions.h
   c9y/latch.h
   c9y/parallel.h
   c9y/queue.h
   c9y/sync.h
   c9y/task_pool.h
   c9y/thread_pool.h
+  c9y/utils.h
 )
 
 # library
@@ -47,13 +49,14 @@ if(ENABLE_UNIT_TESTS)
   add_executable(c9y-test   
     c9y-test/async_test.cpp
     c9y-test/coroutine_test.cpp
+    c9y-test/exception_test.cpp
     c9y-test/latch_test.cpp
     c9y-test/main.cpp
     c9y-test/paralell_test.cpp
+    c9y-test/philosophers_test.cpp
     c9y-test/queue_test.cpp
     c9y-test/sync_test.cpp
     c9y-test/thread_pool_test.cpp
-    c9y-test/exception_test.cpp
   )
   include_directories(.)
   target_compile_features(c9y-test PRIVATE cxx_std_20)

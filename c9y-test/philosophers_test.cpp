@@ -36,62 +36,6 @@ enum class State
     EATING
 };
 
-template <>
-struct std::formatter<State> : std::formatter<std::string>
-{
-    auto format(State value, format_context& ctx)
-    {
-        switch (value)
-        {
-        case State::INITIAL:
-            return formatter<string>::format("INITIAL", ctx);
-        case State::THINKING:
-            return formatter<string>::format("THINKING", ctx);
-        case State::EATING:
-            return formatter<string>::format("EATING", ctx);
-        default:
-            assert(false);
-            return formatter<string>::format("", ctx);
-        };
-    }
-};
-
-template <typename T>
-struct std::formatter<std::atomic<T>> : std::formatter<T>
-{
-    auto format(const std::atomic<T>& value, format_context& ctx)
-    {
-        return formatter<T>::format(value.load(), ctx);
-    }
-};
-
-void print(const size_t phi, const State state, const int satiation, const int health)
-{
-    static std::mutex cout_mutex; // prevent cout too tear
-    std::scoped_lock<std::mutex> ls(cout_mutex);
-
-    if (health < 1)
-    {
-        std::cout << std::format("Philosopher {} is dead. [s: {} h: {}]", phi, satiation, health) << std::endl;;
-        return;
-    }
-
-    switch (state)
-    {
-    case State::INITIAL:
-        std::cout << std::format("Philosopher {} woke up. [s: {} h: {}]", phi, satiation, health) << std::endl;
-        return;
-    case State::THINKING:
-        std::cout << std::format("Philosopher {} is thinking. [s: {} h: {}]", phi, satiation, health) << std::endl;
-        return;
-    case State::EATING:
-        std::cout << std::format("Philosopher {} is eating. [s: {} h: {}]", phi, satiation, health) << std::endl;
-        return;
-    default:
-        assert(false);
-    }
-}
-
 namespace atomic
 {
     struct Fork
@@ -112,15 +56,9 @@ namespace atomic
         Philosopher(const Philosopher& rhs)
         : id(rhs.id), state(rhs.state.load()), satiation(rhs.satiation.load()), health(rhs.health.load()) {}
 
-        void print()
-        {
-            ::print(id, state, satiation, health);
-        }
-
         void think(unsigned int duration)
         {
             state = State::THINKING;
-            print();
             health -= duration / 3;
             std::this_thread::sleep_for(std::chrono::milliseconds(duration));
         }
@@ -154,7 +92,6 @@ namespace atomic
             }
 
             state = State::EATING;
-            print();
             std::this_thread::sleep_for(std::chrono::milliseconds(duration));
             satiation += duration;
 
@@ -196,7 +133,6 @@ TEST(philosophers, atomics)
 
             auto id = last_id++;
             ASSERT_LT(id, philosophers.size());
-            philosophers[id].print();
 
             while (philosophers[id].satiation < 100 && philosophers[id].health > 0 )
             {
@@ -258,14 +194,6 @@ TEST(philosophers, async_and_sync)
     std::uniform_int_distribution<> thinking_dist(1, 25);
     std::uniform_int_distribution<> eating_dist(25, 50);
 
-    auto print = [] (const Philosopher& phil)
-    {
-        c9y::sync([id = phil.id, state = phil.state, satiation = phil.satiation.load(), health = phil.health.load()]() mutable
-        {
-            std::cout << std::format("id: {}, state: {}, satiation: {}, health: {}", id, state, satiation, health) << std::endl;
-        });
-    };
-
     auto think = [&] (Philosopher& phil) mutable
     {
         auto f = c9y::sync<std::chrono::milliseconds>([&] () mutable
@@ -275,7 +203,6 @@ TEST(philosophers, async_and_sync)
             phil.health -= ammount / 3;
             return std::chrono::milliseconds(ammount);
         });
-        print(phil);
         std::this_thread::sleep_for(f.get());
     };
 
@@ -298,7 +225,6 @@ TEST(philosophers, async_and_sync)
             return std::chrono::milliseconds(0);
         });
 
-        print(phil);
         auto duration = f.get();
         std::this_thread::sleep_for(duration);
 
@@ -319,8 +245,6 @@ TEST(philosophers, async_and_sync)
     {
         results[i] = c9y::async<bool>([=] () mutable
         {
-            print(philosophers[i]);
-
             while (philosophers[i].satiation < 100)
             {
                 if (philosophers[i].health < 0)

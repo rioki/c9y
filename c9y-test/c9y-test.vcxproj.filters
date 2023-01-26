@@ -45,5 +45,8 @@
     <ClCompile Include="exception_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="jthread_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

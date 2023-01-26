@@ -166,6 +166,7 @@
     <ClCompile Include="async_test.cpp" />
     <ClCompile Include="coroutine_test.cpp" />
     <ClCompile Include="exception_test.cpp" />
+    <ClCompile Include="jthread_test.cpp" />
     <ClCompile Include="latch_test.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="paralell_test.cpp" />

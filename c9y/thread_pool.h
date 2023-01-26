@@ -23,10 +23,10 @@
 #define _C9Y_THREAD_POOL_H_
 
 #include <functional>
-#include <thread>
 #include <vector>
 
 #include "defines.h"
+#include "jthread.h"
 
 namespace c9y
 {
@@ -60,11 +60,7 @@ namespace c9y
         thread_pool(thread_pool&& other) noexcept = default;
 
         //! Destructor
-        #ifdef __cpp_lib_jthread
         ~thread_pool() = default;
-        #else
-        ~thread_pool();
-        #endif
 
         //! Move Asignment
         thread_pool& operator = (thread_pool&& other) noexcept = default;
@@ -78,7 +74,6 @@ namespace c9y
         //! the coresponsing memory is freed.
         void join();
 
-        #ifdef __cpp_lib_jthread
         //! Request the thread pool to stop.
         //!
         //! If the thread function was initialized with a stop_token and handles
@@ -86,15 +81,9 @@ namespace c9y
         //!
         //! @returns true if the stop request could be issues to all threads.
         bool request_stop() noexcept;
-        #endif
 
     private:
-        #ifdef __cpp_lib_jthread
-        std::vector<std::jthread> threads;
-        #else
-        // clang, update your stdlib!
-        std::vector<std::thread> threads;
-        #endif
+        std::vector<jthread> threads;
 
         thread_pool(const thread_pool&) = delete;
         thread_pool& operator = (const thread_pool&) = delete;

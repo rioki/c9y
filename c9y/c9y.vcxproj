@@ -164,6 +164,7 @@
     <ClInclude Include="coroutine.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="exceptions.h" />
+    <ClInclude Include="jthread.h" />
     <ClInclude Include="latch.h" />
     <ClInclude Include="parallel.h" />
     <ClInclude Include="queue.h" />
@@ -175,6 +176,7 @@
   <ItemGroup>
     <ClCompile Include="async.cpp" />
     <ClCompile Include="exceptions.cpp" />
+    <ClCompile Include="jthread.cpp" />
     <ClCompile Include="latch.cpp" />
     <ClCompile Include="parallel.cpp" />
     <ClCompile Include="sync.cpp" />

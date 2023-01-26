@@ -26,6 +26,7 @@
 #include "async.h"
 #include "coroutine.h"
 #include "exceptions.h"
+#include "jthread.h"
 #include "latch.h"
 #include "parallel.h"
 #include "queue.h"

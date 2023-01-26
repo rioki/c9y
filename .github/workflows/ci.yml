@@ -37,6 +37,7 @@ jobs:
             }
           }
   msbuild:
+    needs: check
     strategy:
       fail-fast: false
       matrix:
@@ -82,6 +83,7 @@ jobs:
       continue-on-error: true
       run: ${{matrix.platform}}/${{matrix.config}}/c9y-test.exe
   cmake:
+    needs: check
     strategy:
       fail-fast: false
       matrix:

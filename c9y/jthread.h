@@ -169,8 +169,8 @@ namespace c9y
         void swap(jthread& other) noexcept;
 
     private:
-        stop_source   stop;
-        std::thread   impl;
+        stop_source stop = {};
+        std::thread impl;
 
         jthread(const jthread&) = delete;
         jthread& operator = (const jthread& other) noexcept = delete;

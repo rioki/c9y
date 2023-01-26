@@ -47,8 +47,9 @@ namespace c9y
 
     bool thread_pool::request_stop() noexcept
     {
-        return std::ranges::all_of(threads, [] (auto& thread) {
-            return thread.request_stop();
-        });
+        for (auto& thread : threads)
+        {
+            thread.request_stop();
+        }
     }
 }

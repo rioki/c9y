@@ -176,20 +176,6 @@ namespace c9y
         jthread& operator = (const jthread& other) noexcept = delete;
     };
 
-    template<class Function, class... Args>
-    requires std::is_invocable_v<std::decay_t<Function>, std::decay_t<Args>...>
-    std::thread make_thread(Function&& f, stop_token token, Args&&... args)
-    {
-        return std::thread{std::forward<Function>(f), std::forward<Args>(args)...};
-    }
-
-    template<class Function, class... Args>
-    requires std::is_invocable_v<std::decay_t<Function>, stop_token, std::decay_t<Args>...>
-    std::thread make_thread(Function&& f, stop_token token, Args&&... args)
-    {
-        return std::thread{std::forward<Function>(f), token, std::forward<Args>(args)...};
-    }
-
     inline void swap(jthread& lhs, jthread& rhs) noexcept
     {
         lhs.swap(rhs);

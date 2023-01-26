@@ -13,6 +13,7 @@ set(HEADERS
   c9y/coroutine.h
   c9y/defines.h
   c9y/exceptions.h
+  c9y/jthread.h
   c9y/latch.h
   c9y/parallel.h
   c9y/queue.h
@@ -25,12 +26,13 @@ set(HEADERS
 # library
 add_library(c9y   
   c9y/async.cpp
+  c9y/exceptions.cpp
+  c9y/jthread.cpp
   c9y/latch.cpp
   c9y/parallel.cpp
   c9y/sync.cpp
   c9y/task_pool.cpp
   c9y/thread_pool.cpp
-  c9y/exceptions.cpp
 )
 target_include_directories(c9y SYSTEM INTERFACE 
   "$<BUILD_INTERFACE:${c9y_SOURCE_DIR}>"
@@ -50,6 +52,7 @@ if(ENABLE_UNIT_TESTS)
     c9y-test/async_test.cpp
     c9y-test/coroutine_test.cpp
     c9y-test/exception_test.cpp
+    c9y-test/jthread_test.cpp
     c9y-test/latch_test.cpp
     c9y-test/main.cpp
     c9y-test/paralell_test.cpp

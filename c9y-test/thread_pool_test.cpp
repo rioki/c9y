@@ -73,10 +73,9 @@ TEST(thread_pool, no_join)
     auto pool = c9y::thread_pool{[] {}};
 }
 
-#ifdef __cpp_lib_jthread
 TEST(thread_pool, stop_rquest)
 {
-    auto pool = c9y::thread_pool{[&] (std::stop_token st) {
+    auto pool = c9y::thread_pool{[&] (c9y::stop_token st) {
         while (!st.stop_requested())
         {
             std::this_thread::sleep_for(10ms);
@@ -85,4 +84,3 @@ TEST(thread_pool, stop_rquest)
 
     EXPECT_TRUE(pool.request_stop());
 }
-#endif

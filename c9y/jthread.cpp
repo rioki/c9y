@@ -21,6 +21,7 @@
 
 #include "jthread.h"
 
+#ifndef __cpp_lib_jthread
 #include <cassert>
 #include <atomic>
 #include <mutex>
@@ -223,3 +224,5 @@ namespace c9y
         impl.swap(other.impl);
     }
 }
+#endif
+

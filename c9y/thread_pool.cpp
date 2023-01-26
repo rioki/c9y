@@ -47,9 +47,11 @@ namespace c9y
 
     bool thread_pool::request_stop() noexcept
     {
+        auto result = false;
         for (auto& thread : threads)
         {
-            thread.request_stop();
+            result &= thread.request_stop();
         }
+        return result;
     }
 }

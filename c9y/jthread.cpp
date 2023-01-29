@@ -21,7 +21,7 @@
 
 #include "jthread.h"
 
-#ifndef __cpp_lib_jthread
+#ifndef C9Y_USE_STD_JTHREAD
 #include <cassert>
 #include <atomic>
 #include <mutex>
@@ -29,18 +29,41 @@
 
 namespace c9y
 {
-    struct StopState
+    // this is not efficient, but it only needs to be correct
+    class stop_state
     {
-        std::atomic<bool> request_stop = false;
+    public:
+        stop_state() = default;
+        ~stop_state() = default;
 
-        // this is not efficient, but it only needs to be correct
-        std::mutex callbacks_mutex;
-        std::vector<stop_callback*> callbacks;
+        bool request_stop() noexcept
+        {
+            auto lk = std::unique_lock<std::mutex>(mutex);
+            if (stopping == true)
+            {
+                return false;
+            }
+
+            stopping = true;
+            for (const auto& cb : callbacks)
+            {
+                assert(cb->callback);
+                cb->callback();
+            }
+            callbacks.clear();
+            return true;
+        }
+
+        bool stop_requested() const noexcept
+        {
+            auto lk = std::unique_lock<std::mutex>(mutex);
+            return stopping;
+        }
 
         void add_callback(stop_callback* callback)
         {
-            auto lk = std::unique_lock<std::mutex>(callbacks_mutex);
-            if (!request_stop)
+            auto lk = std::unique_lock<std::mutex>(mutex);
+            if (!stopping)
             {
                 callbacks.push_back(callback);
             }
@@ -52,7 +75,7 @@ namespace c9y
 
         void remove_callback(stop_callback* callback)
         {
-            auto lk = std::unique_lock<std::mutex>(callbacks_mutex);
+            auto lk = std::unique_lock<std::mutex>(mutex);
             auto i = std::find(begin(callbacks), end(callbacks), callback);
             if (i != end(callbacks))
             {
@@ -60,21 +83,18 @@ namespace c9y
             }
         }
 
-        void exec_callbacks()
-        {
-            auto lk = std::unique_lock<std::mutex>(callbacks_mutex);
-            for (const auto& cb : callbacks)
-            {
-                assert(cb->callback);
-                cb->callback();
-            }
-            callbacks.clear();
-        }
+    private:
+        mutable std::mutex mutex;
+        bool stopping = false;
+        std::vector<stop_callback*> callbacks;
+
+        stop_state(const stop_state&) = delete;
+        stop_state& operator = (const stop_state&) = delete;
     };
 
     stop_token::stop_token() = default;
 
-    stop_token::stop_token(std::shared_ptr<StopState> s)
+    stop_token::stop_token(std::shared_ptr<stop_state> s)
     : state(s) {}
 
     stop_token::stop_token(const stop_token& other) noexcept = default;
@@ -88,7 +108,7 @@ namespace c9y
     {
         if (state)
         {
-            return state->request_stop;
+            return state->stop_requested();
         }
         return false;
     }
@@ -104,9 +124,9 @@ namespace c9y
     }
 
     stop_source::stop_source()
-    : state(std::make_shared<StopState>()) {}
+    : state(std::make_shared<stop_state>()) {}
 
-    stop_source::stop_source(nostopstate_t nss) noexcept {}
+    stop_source::stop_source(nostopstate_t) noexcept {}
 
     stop_source::stop_source(const stop_source& other) noexcept = default;
     stop_source::stop_source(stop_source&& other) noexcept = default;
@@ -122,10 +142,9 @@ namespace c9y
 
     bool stop_source::request_stop() noexcept
     {
-        if (state && (state->request_stop.exchange(true) == false))
+        if (state)
         {
-            state->exec_callbacks();
-            return true;
+            return state->request_stop();
         }
         return false;
     }

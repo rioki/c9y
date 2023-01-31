@@ -50,7 +50,10 @@ namespace c9y
         auto result = false;
         for (auto& thread : threads)
         {
-            result &= thread.request_stop();
+            // the result for one must be the same as for all; unless
+            // multuple threads call request_stop at the same time;
+            // but then we are in a "tree in the wood, nobody listens" situation.
+            result = thread.request_stop();
         }
         return result;
     }

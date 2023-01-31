@@ -28,16 +28,21 @@
 
 #include "defines.h"
 
+#ifdef __cpp_lib_jthread
+#define C9Y_USE_STD_JTHREAD
+#endif
+
+
 namespace c9y
 {
-    #ifdef __cpp_lib_jthread
+    #ifdef C9Y_USE_STD_JTHREAD
     using std::jthread;
     using std::stop_token;
     using std::stop_source;
     using std::stop_callback;
     using std::nostopstate;
     #else
-    struct StopState;
+    struct stop_state;
 
     struct nostopstate_t {};
     constexpr auto nostopstate = nostopstate_t{};
@@ -46,7 +51,6 @@ namespace c9y
     {
     public:
         stop_token();
-        explicit stop_token(std::shared_ptr<StopState> state);
         stop_token(const stop_token& other) noexcept;
         stop_token(stop_token&& other) noexcept;
         ~stop_token();
@@ -60,9 +64,12 @@ namespace c9y
         void swap(stop_token& other) noexcept;
 
     private:
-        std::shared_ptr<StopState> state;
+        std::shared_ptr<stop_state> state;
+
+        explicit stop_token(std::shared_ptr<stop_state> state);
 
     friend class stop_callback;
+    friend class stop_source;
     };
 
     inline void swap(stop_token& lhs, stop_token& rhs) noexcept
@@ -74,7 +81,7 @@ namespace c9y
     {
     public:
         stop_source();
-        explicit stop_source(nostopstate_t nss) noexcept;
+        explicit stop_source(nostopstate_t) noexcept;
         stop_source(const stop_source& other) noexcept;
         stop_source(stop_source&& other) noexcept;
         ~stop_source();
@@ -90,7 +97,7 @@ namespace c9y
         void swap(stop_source& other) noexcept;
 
     private:
-        std::shared_ptr<StopState> state;
+        std::shared_ptr<stop_state> state;
     };
 
     inline void swap(stop_source& lhs, stop_source& rhs) noexcept
@@ -128,7 +135,7 @@ namespace c9y
         stop_callback& operator = (const stop_callback& other) noexcept = delete;
         stop_callback& operator = (stop_callback&& other) noexcept = delete;
 
-    friend struct StopState;
+    friend struct stop_state;
     };
 
     //! Drop in replacement for all cases where std::jthread is not yet implemented.

@@ -29,7 +29,7 @@
 #include "defines.h"
 
 #ifdef __cpp_lib_jthread
-#define C9Y_USE_STD_JTHREAD
+//#define C9Y_USE_STD_JTHREAD
 #endif
 
 
@@ -150,14 +150,17 @@ namespace c9y
         jthread(jthread&& other) noexcept;
 
         template<class Function, class... Args>
-        requires std::is_invocable_v<std::decay_t<Function>, std::decay_t<Args>...>
         explicit jthread(Function&& f, Args&&... args)
-        : impl(std::forward<Function>(f), std::forward<Args>(args)...) {}
-
-        template<class Function, class... Args>
-        requires std::is_invocable_v<std::decay_t<Function>, stop_token, std::decay_t<Args>...>
-        explicit jthread(Function&& f, Args&&... args)
-        : impl(std::forward<Function>(f), stop.get_token(), std::forward<Args>(args)...) {}
+        {
+            if constexpr (std::is_invocable_v<std::decay_t<Function>, stop_token, std::decay_t<Args>...>)
+            {
+                impl = std::thread(std::forward<Function>(f), stop.get_token(), std::forward<Args>(args)...);
+            }
+            else
+            {
+                impl = std::thread(std::forward<Function>(f), std::forward<Args>(args)...);
+            }
+        }
 
         ~jthread();
 

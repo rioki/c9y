@@ -28,6 +28,8 @@
 TEST(jthread, create_and_destroy)
 {
     auto thread = c9y::jthread{};
+    EXPECT_FALSE(thread.joinable());
+    EXPECT_FALSE(thread.get_stop_source().stop_possible());
 }
 
 TEST(jthread, launch_thread)

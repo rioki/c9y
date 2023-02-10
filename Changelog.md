@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2023-02-10
+
+### Added
+
+- added drop in replacement for jthread
+- added better introduction in README.md
+- added check to prevent CMake getting out of sync
+
+### Fixed
+
+- fixed missing exceptions.h in CMake
+
 ## [0.6.2] - 2023-01-18
 
 ### Added
@@ -148,8 +160,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - condition class
 - lock class
 
-[Unreleased]: https://github.com/rioki/c9y/compare/v0.6.2...master
+[Unreleased]: https://github.com/rioki/c9y/compare/v0.7.0...master
 
+[0.7.0]: https://github.com/rioki/c9y/compare/v0.6.2...v0.7.0
 [0.6.2]: https://github.com/rioki/c9y/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/rioki/c9y/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/rioki/c9y/compare/v0.5.1...v0.6.0

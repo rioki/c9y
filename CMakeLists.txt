@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(c9y
-        VERSION 0.6.2
+        VERSION 0.7.0
         DESCRIPTION "Concurency"
         LANGUAGES CXX
 )

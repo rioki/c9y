@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - sync will shortcut the execution if the target thread is the current thread
-- delay will always queue up a task and is not synnymous with sync(this_thread)
+- delay will always queue up a task and is not synonymous with sync(this_thread)
 
 ## [0.7.0] - 2023-02-10
 

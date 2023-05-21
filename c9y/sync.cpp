@@ -46,14 +46,41 @@ namespace c9y
         return main_thread_id;
     }
 
+    void _sync(const std::thread::id& thread, const std::function<void()>& func) noexcept
+    {
+        assert(func);
+        std::scoped_lock<std::mutex> sl(tasks_mutex);
+        tasks[thread].push_back(func);
+    }
+
+    void _sync(once_tag& tag, const std::thread::id& thread, const std::function<void()>& func) noexcept
+    {
+        assert(func);
+        if (tag.active.exchange(true) == false)
+        {
+            _sync(thread, [&tag, func]() {
+                try
+                {
+                    func();
+                    tag.active = false;
+                }
+                catch (...)
+                {
+                    tag.active = false;
+                    throw;
+                }
+            });
+        }
+    }
+
     void delay(const std::function<void()>& func) noexcept
     {
-        sync(std::this_thread::get_id(), func);
+        _sync(std::this_thread::get_id(), func);
     }
 
     void delay(once_tag& tag, const std::function<void()>& func) noexcept
     {
-        sync(tag, std::this_thread::get_id(), func);
+        _sync(tag, std::this_thread::get_id(), func);
     }
 
     void sync(const std::function<void()>& func) noexcept
@@ -72,27 +99,41 @@ namespace c9y
     void sync(const std::thread::id& thread, const std::function<void()>& func) noexcept
     {
         assert(func);
-        std::scoped_lock<std::mutex> sl(tasks_mutex);
-        tasks[thread].push_back(func);
+        if (thread == std::this_thread::get_id())
+        {
+            try
+            {
+                func();
+            }
+            catch (...)
+            {
+                unhandled_exception();
+            }
+        }
+        else
+        {
+            _sync(thread, func);
+        }
     }
 
     void sync(once_tag& tag, const std::thread::id& thread, const std::function<void()>& func) noexcept
     {
         assert(func);
-        if (tag.active.exchange(true) == false)
+        if (thread == std::this_thread::get_id())
         {
-            sync(thread, [&tag, func]() {
-                try
-                {
-                    func();
-                    tag.active = false;
-                }
-                catch (...)
-                {
-                    tag.active = false;
-                    throw;
-                }
-            });
+            try
+            {
+                func();
+                tag.active = false;
+            }
+            catch (...)
+            {
+                unhandled_exception();
+            }
+        }
+        else
+        {
+            _sync(tag, thread, func);
         }
     }
 

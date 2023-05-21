@@ -141,6 +141,88 @@ TEST(sync, sync_main_thread_with_result)
     EXPECT_EQ(42, result);
 }
 
+TEST(sync, same_thread_shortcut)
+{
+    std::thread::id exec_id;
+    c9y::sync(std::this_thread::get_id(), [&] () {
+        exec_id = std::this_thread::get_id();
+    });
+    EXPECT_EQ(std::this_thread::get_id(), exec_id);
+}
+
+TEST(sync, same_thread_shortcut_with_reault)
+{
+    std::thread::id exec_id;
+    auto f = c9y::sync<unsigned int>(std::this_thread::get_id(), [&] () {
+        exec_id = std::this_thread::get_id();
+        return 42u;
+    });
+
+    auto result = f.get();
+
+    EXPECT_EQ(std::this_thread::get_id(), exec_id);
+    EXPECT_EQ(42u, result);
+}
+
+TEST(sync, same_thread_shortcut_main_thread)
+{
+    c9y::set_main_thread_id(std::this_thread::get_id());
+
+    std::thread::id exec_id;
+    c9y::sync([&] () {
+        exec_id = std::this_thread::get_id();
+    });
+    EXPECT_EQ(std::this_thread::get_id(), exec_id);
+}
+
+TEST(sync, same_thread_shortcut_with_reault_main_thread)
+{
+    c9y::set_main_thread_id(std::this_thread::get_id());
+
+    std::thread::id exec_id;
+    auto f = c9y::sync<unsigned int>([&] () {
+        exec_id = std::this_thread::get_id();
+        return 42u;
+    });
+
+    auto result = f.get();
+
+    EXPECT_EQ(std::this_thread::get_id(), exec_id);
+    EXPECT_EQ(42u, result);
+}
+
+TEST(sync, same_thread_shortcut_once_is_actually_useless)
+{
+    auto ot    = c9y::once_tag{};
+    auto count = 0u;
+    auto func  = c9y::sync_fun(ot, std::this_thread::get_id(), [&] () {
+        count++;
+    });
+
+    func();
+    func();
+    func();
+
+    EXPECT_EQ(3u, count);
+}
+
+TEST(sync, same_thread_shortcut_once_is_actually_useless_main_thread)
+{
+    c9y::set_main_thread_id(std::this_thread::get_id());
+
+    auto ot    = c9y::once_tag{};
+    auto count = 0u;
+    auto func  = c9y::sync_fun(ot, [&] () {
+        count++;
+    });
+
+    func();
+    func();
+    func();
+
+    EXPECT_EQ(3u, count);
+}
+
 TEST(sync, delay)
 {
     unsigned int result = 0;
@@ -148,6 +230,8 @@ TEST(sync, delay)
     c9y::delay([&] () {
         result = 42;
     });
+
+    EXPECT_EQ(0, result);
 
     while (result == 0)
     {
@@ -191,7 +275,7 @@ TEST(sync, delay_once)
 
 #ifdef __cpp_lib_jthread
 // This also works without jthread; but I can't be bothered
-// to reqwrite these tests for the neanderthals.
+// to rewrite these tests for the neanderthals.
 
 TEST(sync, sync_fun_main_thread)
 {

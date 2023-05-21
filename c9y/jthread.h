@@ -42,7 +42,7 @@ namespace c9y
     using std::stop_callback;
     using std::nostopstate;
     #else
-    struct stop_state;
+    class stop_state;
 
     struct nostopstate_t {};
     constexpr auto nostopstate = nostopstate_t{};
@@ -135,7 +135,7 @@ namespace c9y
         stop_callback& operator = (const stop_callback& other) noexcept = delete;
         stop_callback& operator = (stop_callback&& other) noexcept = delete;
 
-    friend struct stop_state;
+    friend class stop_state;
     };
 
     //! Drop in replacement for all cases where std::jthread is not yet implemented.

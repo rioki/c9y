@@ -25,6 +25,7 @@ jobs:
       - name: Custom Code Review and Comment
         uses: actions/github-script@v6
         env:
+          FILE_PATTERN: '*.cpp *.h *.md'
           CUSTOM_PROMPT: 'Please review the code from the following code diff:'
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
@@ -35,7 +36,7 @@ jobs:
               const filePattern = process.env.FILE_PATTERN;
               const customPrompt = process.env.CUSTOM_PROMPT;
               // Fetch diff based on the file pattern
-              const diff = execSync(`git diff ${{ github.event.pull_request.base.sha }} HEAD`).toString();
+              const diff = execSync(`git diff ${{ github.event.pull_request.base.sha }} HEAD -- ${filePattern}`).toString();
               // Request GPT-4 review
               const payload = {
                 model: 'gpt-4',

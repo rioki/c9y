@@ -168,6 +168,7 @@
     <ClInclude Include="latch.h" />
     <ClInclude Include="parallel.h" />
     <ClInclude Include="queue.h" />
+    <ClInclude Include="resetting_latch.h" />
     <ClInclude Include="sync.h" />
     <ClInclude Include="task_pool.h" />
     <ClInclude Include="thread_pool.h" />
@@ -179,6 +180,7 @@
     <ClCompile Include="jthread.cpp" />
     <ClCompile Include="latch.cpp" />
     <ClCompile Include="parallel.cpp" />
+    <ClCompile Include="resetting_latch.cpp" />
     <ClCompile Include="sync.cpp" />
     <ClCompile Include="task_pool.cpp" />
     <ClCompile Include="thread_pool.cpp" />

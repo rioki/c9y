@@ -172,6 +172,7 @@
     <ClCompile Include="paralell_test.cpp" />
     <ClCompile Include="philosophers_test.cpp" />
     <ClCompile Include="queue_test.cpp" />
+    <ClCompile Include="resetting_latch_test.cpp" />
     <ClCompile Include="sync_test.cpp" />
     <ClCompile Include="thread_pool_test.cpp" />
   </ItemGroup>

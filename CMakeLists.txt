@@ -17,6 +17,7 @@ set(HEADERS
   c9y/latch.h
   c9y/parallel.h
   c9y/queue.h
+  c9y/resetting_latch.h
   c9y/sync.h
   c9y/task_pool.h
   c9y/thread_pool.h
@@ -30,6 +31,7 @@ add_library(c9y
   c9y/jthread.cpp
   c9y/latch.cpp
   c9y/parallel.cpp
+  c9y/resetting_latch.cpp
   c9y/sync.cpp
   c9y/task_pool.cpp
   c9y/thread_pool.cpp
@@ -58,6 +60,7 @@ if(ENABLE_UNIT_TESTS)
     c9y-test/paralell_test.cpp
     c9y-test/philosophers_test.cpp
     c9y-test/queue_test.cpp
+    c9y-test/resetting_latch_test.cpp
     c9y-test/sync_test.cpp
     c9y-test/thread_pool_test.cpp
   )

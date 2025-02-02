@@ -17,7 +17,7 @@ set(HEADERS
   c9y/latch.h
   c9y/parallel.h
   c9y/queue.h
-  c9y/resetting_latch.h
+  c9y/barrier.h
   c9y/sync.h
   c9y/task_pool.h
   c9y/thread_pool.h

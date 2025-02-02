@@ -20,7 +20,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - name: Check CMake 
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
           let path = require('path');

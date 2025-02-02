@@ -26,7 +26,7 @@
 
 #include <cstddef>
 
-#ifdef __cpp_lib_coroutine
+#if defined __cpp_lib_coroutine && defined C9Y_OLD_COROUTINE
 
 #include <future>
 #include <coroutine>

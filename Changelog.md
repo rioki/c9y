@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - fixed queue to handle movable objects
 
+### Removed
+
+- removed coroutines as the current implementaiton is flawed; you can still
+  access them by defining C9Y_OLD_COROUTINE as a fallback
 
 ## [0.8.0] - 2023-05-21
 

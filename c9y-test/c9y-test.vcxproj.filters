@@ -48,7 +48,7 @@
     <ClCompile Include="jthread_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="resetting_latch_test.cpp">
+    <ClCompile Include="barrier_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

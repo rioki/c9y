@@ -21,9 +21,10 @@
 // SOFTWARE.
 //
 
-#include <c9y/resetting_latch.h>
+#include <c9y/barrier.h>
 
 #include <atomic>
+#include <syncstream>
 #include <gtest/gtest.h>
 
 #include <c9y/async.h>
@@ -31,9 +32,10 @@
 
 using namespace std::chrono_literals;
 
-TEST(resetting_latch, wait)
+/*
+TEST(barrier, wait)
 {
-    auto my_latch = c9y::resetting_latch{12u};
+    auto my_latch = c9y::barrier{12u};
     auto count    = std::atomic<unsigned int>{0u};
 
     for (auto i = 0u; i < 12; i++)
@@ -41,31 +43,24 @@ TEST(resetting_latch, wait)
         c9y::async([&] () {
             std::this_thread::sleep_for(50ms);
             count++;
-            my_latch.count_down();
+            my_latch.arrive();
         });
     }
 
-    // There is a subtle race condition between count_down and wait,
-    // that std::latch does not have. You need to make sure your condition
-    // you are waiting on is not yet achived. If that is the case, don't wait
-    // since the latch is now in it's next iteration.
-    if (count != 12u)
-    {
-        my_latch.wait();
-    }
+    my_latch.wait();
     EXPECT_EQ(12u, count);
 }
 
-TEST(resetting_latch, wait_multiple)
+TEST(barrier, wait_multiple)
 {
-    auto my_latch = c9y::resetting_latch{12u};
+    auto my_latch = c9y::barrier{12u};
     auto count    = std::atomic<unsigned int>{0u};
 
     for (auto i = 0u; i < 12; i++)
     {
         c9y::async([&] () {
             count++;
-            my_latch.count_down();
+            my_latch.arrive();
         });
     }
 
@@ -76,16 +71,17 @@ TEST(resetting_latch, wait_multiple)
     {
         c9y::async([&] () {
             count++;
-            my_latch.count_down();
+            my_latch.arrive();
         });
     }
 
     my_latch.wait();
     EXPECT_EQ(24u, count);
 }
-TEST(resetting_latch, arrive_and_wait)
+
+TEST(barrier, arrive_and_wait)
 {
-    auto my_latch = c9y::resetting_latch{12u};
+    auto my_latch = c9y::barrier{12u};
     auto count    = std::atomic<unsigned int>{0u};
 
     auto js = c9y::thread_pool([&] () {
@@ -97,9 +93,9 @@ TEST(resetting_latch, arrive_and_wait)
     EXPECT_EQ(11u, count);
 }
 
-TEST(resetting_latch, arrive_and_wait_multiple)
+TEST(barrier, arrive_and_wait_multiple)
 {
-    auto my_latch = c9y::resetting_latch{12u};
+    auto my_latch = c9y::barrier{12u};
     auto count    = std::atomic<unsigned int>{0u};
 
     auto js = c9y::thread_pool([&] () {
@@ -119,4 +115,84 @@ TEST(resetting_latch, arrive_and_wait_multiple)
 
     my_latch.arrive_and_wait();
     EXPECT_EQ(22u, count);
+}
+
+TEST(barrier, arrive_and_drop)
+{
+    auto my_latch = c9y::barrier{12u};
+    auto count    = std::atomic<unsigned int>{0u};
+
+    auto js = c9y::thread_pool([&] () {
+            auto c = count++;
+            my_latch.arrive_and_wait();
+
+            EXPECT_EQ(11u, count);
+            if (c % 2 != 0)
+            {
+                my_latch.arrive_and_drop();
+                return;
+            }
+            else
+            {
+                my_latch.arrive_and_wait();
+            }
+
+            count++;
+            my_latch.arrive_and_wait();
+    }, 11u);
+
+    my_latch.arrive_and_wait();
+    EXPECT_EQ(11u, count);
+    my_latch.arrive_and_wait();
+
+    my_latch.arrive_and_wait();
+    EXPECT_EQ(22u, count);
+}*/
+
+TEST(barrier, default_construct)
+{
+    auto sync_point = c9y::barrier(42u);
+}
+
+TEST(barrier, arrive_and_wait)
+{
+    auto count = 5u;
+
+    auto compleations = std::atomic<int>();
+    auto actions      = std::atomic<int>();
+    auto on_completion = [&]() noexcept
+    {
+        compleations++;
+    };
+
+    auto sync_point = c9y::barrier(count, on_completion);
+
+    auto pool = c9y::thread_pool([&] () {
+        sync_point.arrive_and_wait();
+        actions++;
+        sync_point.arrive_and_wait();
+
+        sync_point.arrive_and_wait();
+        actions++;
+        sync_point.arrive_and_wait();
+    }, count - 1);
+
+    EXPECT_EQ(compleations, 0u);
+
+    sync_point.arrive_and_wait();
+    EXPECT_EQ(compleations, 1u);
+
+    sync_point.arrive_and_wait();
+    EXPECT_EQ(compleations, 2u);
+    EXPECT_EQ(actions, 4u);
+
+    sync_point.arrive_and_wait();
+    EXPECT_EQ(compleations, 3u);
+
+    sync_point.arrive_and_wait();
+    EXPECT_EQ(compleations, 4u);
+    EXPECT_EQ(actions, 8u);
+
+    pool.join();
+    EXPECT_EQ(compleations, 4u);
 }

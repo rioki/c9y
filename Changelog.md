@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- added resetting_latch, same as std::latch (escept try_wait) but reusable.
+- added barrier
 
 ### Fixed
 

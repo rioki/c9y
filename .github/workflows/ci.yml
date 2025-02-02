@@ -12,7 +12,7 @@ permissions:
 
 env:
   VCPKG_COMMIT: 0ca64b4e1c70fa6d9f53b369b8f3f0843797c20c
-  VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
   CTEST_OUTPUT_ON_FAILURE: 1
 
 jobs:
@@ -61,19 +61,6 @@ jobs:
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
         appendedCacheKey: ${{ matrix.triplet }}
-    - name: 'Setup NuGet/Vcpkg Credentials'
-      shell: 'bash'
-      run: >
-        `./vcpkg/vcpkg fetch nuget | tail -n 1` \
-          sources add \
-          -source "https://nuget.pkg.github.com/rioki/index.json" \
-          -storepasswordincleartext \
-          -name "GitHub" \
-          -username "rioki" \
-          -password "${{ secrets.GITHUB_TOKEN }}"
-        `./vcpkg/vcpkg fetch nuget | tail -n 1` \
-          setapikey "${{ secrets.GITHUB_TOKEN }}" \
-          -source "https://nuget.pkg.github.com/rioki/index.json"
     - name: Integrate vcpkg in MSBuild
       shell: 'bash'
       run: vcpkg.exe integrate install
@@ -91,16 +78,12 @@ jobs:
         include:
           - triplet: x86-windows
             system: windows-latest
-            mono: ''
           - triplet: x64-windows
             system: windows-latest
-            mono: ''
           - triplet: x64-linux
             system: ubuntu-latest
-            mono: ''
           - triplet: x64-macos
             system: macos-latest
-            mono: ''
     runs-on: ${{ matrix.system }}
     env:
       VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
@@ -114,19 +97,6 @@ jobs:
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
         appendedCacheKey: ${{ matrix.triplet }}
-    - name: 'Setup NuGet/Vcpkg Credentials'
-      shell: 'bash'
-      run: >
-        ${{ matrix.mono }} `./vcpkg/vcpkg fetch nuget | tail -n 1` \
-          sources add \
-          -source "https://nuget.pkg.github.com/rioki/index.json" \
-          -storepasswordincleartext \
-          -name "GitHub" \
-          -username "rioki" \
-          -password "${{ secrets.GITHUB_TOKEN }}"
-        ${{ matrix.mono }} `./vcpkg/vcpkg fetch nuget | tail -n 1` \
-          setapikey "${{ secrets.GITHUB_TOKEN }}" \
-          -source "https://nuget.pkg.github.com/rioki/index.json"
     - name: Build
       uses: lukka/run-cmake@v10
       with:

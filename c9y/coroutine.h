@@ -26,7 +26,7 @@
 
 #include <cstddef>
 
-#ifdef __cpp_lib_coroutine
+#if defined __cpp_lib_coroutine && defined C9Y_OLD_COROUTINE
 
 #include <future>
 #include <coroutine>
@@ -34,24 +34,24 @@
 #include "async.h"
 #include "sync.h"
 
-namespace c9y
+namespace std
 {
     template <typename T, typename ... Args>
-    struct std::coroutine_traits<std::future<T>, Args...>
+    struct coroutine_traits<future<T>, Args...>
     {
-        struct promise_type : std::promise<T>
+        struct promise_type : promise<T>
         {
-            std::future<T> get_return_object() noexcept
+            future<T> get_return_object() noexcept
             {
                 return this->get_future();
             }
 
-            std::suspend_never initial_suspend() const noexcept
+            suspend_never initial_suspend() const noexcept
             {
                 return {};
             }
 
-            std::suspend_never final_suspend() const noexcept
+            suspend_never final_suspend() const noexcept
             {
                 return {};
             }
@@ -63,12 +63,12 @@ namespace c9y
 
             void return_value(T&& value) noexcept
             {
-                this->set_value(std::move(value));
+                this->set_value(move(value));
             }
 
             void unhandled_exception() noexcept
             {
-                this->set_exception(std::current_exception());
+                this->set_exception(current_exception());
             }
         };
     };
@@ -76,7 +76,7 @@ namespace c9y
     template <typename... Args>
     struct std::coroutine_traits<std::future<void>, Args...>
     {
-        struct promise_type : std::promise<void>
+        struct promise_type : promise<void>
         {
             std::future<void> get_return_object() noexcept
             {
@@ -94,12 +94,14 @@ namespace c9y
                 this->set_value();
             }
             void unhandled_exception() noexcept {
-                this->set_exception(std::current_exception());
+                this->set_exception(current_exception());
             }
         };
     };
+}
 
-
+namespace c9y
+{
     namespace co_async
     {
         //! co_await operator implemented with async.

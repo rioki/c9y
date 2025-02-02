@@ -79,6 +79,15 @@ namespace c9y
             cond.notify_one();
         }
 
+        void push(value_type&& value) noexcept
+        {
+            {
+                auto lock = std::unique_lock<std::mutex>{mutex};
+                container.push_back(std::forward<value_type>(value));
+            }
+            cond.notify_one();
+        }
+
         template<typename... Args>
         void emplace(Args&&... args) noexcept(std::is_nothrow_constructible_v<value_type, Args...>)
         {
@@ -102,7 +111,7 @@ namespace c9y
             auto lock = std::unique_lock<std::mutex>{mutex};
             if (!container.empty())
             {
-                auto value = container.front();
+                auto value = std::move(container.front());
                 container.pop_front();
                 return value;
             }
@@ -134,7 +143,7 @@ namespace c9y
                 return std::nullopt;
             }
 
-            auto value = container.front();
+            auto value = std::move(container.front());;
             container.pop_front();
             return value;
         }
@@ -159,7 +168,7 @@ namespace c9y
                 return std::nullopt;
             }
 
-            auto value = container.front();
+            auto value = std::move(container.front());
             container.pop_front();
             return value;
         }

@@ -35,7 +35,7 @@
 
 #include <gtest/gtest.h>
 
-#ifdef __cpp_lib_coroutine
+#if defined __cpp_lib_coroutine && defined C9Y_OLD_COROUTINE
 #include <coroutine>
 
 std::future<int> compute_async() {

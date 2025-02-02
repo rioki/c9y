@@ -51,7 +51,10 @@ TEST(queue, consumer_producer)
     auto cons = c9y::thread_pool{[&] () {
         while (auto value = q.pop())
         {
-            count++;
+            if (value)
+            {
+                count += *value;
+            }
             std::this_thread::sleep_for(1ms);
         }
     }, 3};
@@ -59,7 +62,7 @@ TEST(queue, consumer_producer)
     prod.join();
     cons.join();
 
-    EXPECT_EQ(300, static_cast<unsigned int>(count));
+    EXPECT_EQ(15150, static_cast<unsigned int>(count));
 }
 
 TEST(queue, consumer_producer_wait)
@@ -78,7 +81,10 @@ TEST(queue, consumer_producer_wait)
     auto cons = c9y::thread_pool{[&] () {
         while (auto value = q.pop_wait_for(100ms))
         {
-            count++;
+            if (value)
+            {
+                count += *value;
+            }
             std::this_thread::sleep_for(3ms);
         }
     }, 3};
@@ -88,5 +94,80 @@ TEST(queue, consumer_producer_wait)
     q.stop();
     cons.join();
 
-    EXPECT_EQ(300, static_cast<unsigned int>(count));
+    EXPECT_EQ(15150, static_cast<unsigned int>(count));
+}
+
+struct movable
+{
+    int value;
+
+    movable(int v) noexcept
+    : value(v) {}
+
+    movable(const movable&) noexcept = delete;
+    movable(movable&&) noexcept = default;
+    movable& operator = (movable&) noexcept = delete;
+    movable& operator = (movable&&) noexcept = default;
+};
+
+TEST(queue, consumer_producer_movable)
+{
+    auto q = c9y::queue<movable>{};
+    auto count = std::atomic<unsigned int>{0};
+
+    auto prod = c9y::thread_pool{[&] () {
+        for (int i = 1; i < 101; i++)
+        {
+            q.emplace(i);
+        }
+    }, 3};
+
+    auto cons = c9y::thread_pool{[&] () {
+        while (auto m = q.pop())
+        {
+            if (m)
+            {
+                count += m->value;
+            }
+            std::this_thread::sleep_for(1ms);
+        }
+    }, 3};
+
+    prod.join();
+    cons.join();
+
+    EXPECT_EQ(15150, static_cast<unsigned int>(count));
+}
+
+TEST(queue, consumer_producer_wait_movable)
+{
+    auto q = c9y::queue<movable>{};
+    auto count = std::atomic<unsigned int>{0};
+
+    auto prod = c9y::thread_pool{[&] () {
+        for (int i = 1; i < 101; i++)
+        {
+            auto m = movable{i};
+            q.push(std::move(m));
+            std::this_thread::sleep_for(5ms);
+        }
+    }, 3};
+
+    auto cons = c9y::thread_pool{[&] () {
+        while (auto m = q.pop_wait_for(100ms))
+        {
+            if (m)
+            {
+                count += m->value;
+            }
+            std::this_thread::sleep_for(3ms);
+        }
+    }, 3};
+
+    prod.join();
+    std::this_thread::sleep_for(100ms);
+    q.stop();
+    cons.join();
+
+    EXPECT_EQ(15150, static_cast<unsigned int>(count));
 }

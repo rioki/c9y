@@ -29,7 +29,7 @@
 #include "defines.h"
 
 #ifdef __cpp_lib_jthread
-//#define C9Y_USE_STD_JTHREAD
+#define C9Y_USE_STD_JTHREAD
 #endif
 
 

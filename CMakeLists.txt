@@ -9,6 +9,7 @@ option(ENABLE_UNIT_TESTS "Enable building unit tests." OFF)
 
 set(HEADERS
   c9y/async.h
+  c9y/barrier.h
   c9y/c9y.h
   c9y/coroutine.h
   c9y/defines.h
@@ -17,7 +18,6 @@ set(HEADERS
   c9y/latch.h
   c9y/parallel.h
   c9y/queue.h
-  c9y/resetting_latch.h
   c9y/sync.h
   c9y/task_pool.h
   c9y/thread_pool.h
@@ -25,18 +25,17 @@ set(HEADERS
 )
 
 # library
-add_library(c9y   
+add_library(c9y
   c9y/async.cpp
   c9y/exceptions.cpp
   c9y/jthread.cpp
   c9y/latch.cpp
   c9y/parallel.cpp
-  c9y/resetting_latch.cpp
   c9y/sync.cpp
   c9y/task_pool.cpp
   c9y/thread_pool.cpp
 )
-target_include_directories(c9y SYSTEM INTERFACE 
+target_include_directories(c9y SYSTEM INTERFACE
   "$<BUILD_INTERFACE:${c9y_SOURCE_DIR}>"
   "$<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>"
 )
@@ -50,8 +49,9 @@ set_target_properties(c9y PROPERTIES
 # unit tests
 if(ENABLE_UNIT_TESTS)
   find_package(GTest CONFIG REQUIRED)
-  add_executable(c9y-test   
+  add_executable(c9y-test
     c9y-test/async_test.cpp
+    c9y-test/barrier_test.cpp
     c9y-test/coroutine_test.cpp
     c9y-test/exception_test.cpp
     c9y-test/jthread_test.cpp
@@ -60,7 +60,6 @@ if(ENABLE_UNIT_TESTS)
     c9y-test/paralell_test.cpp
     c9y-test/philosophers_test.cpp
     c9y-test/queue_test.cpp
-    c9y-test/resetting_latch_test.cpp
     c9y-test/sync_test.cpp
     c9y-test/thread_pool_test.cpp
   )
@@ -70,13 +69,13 @@ if(ENABLE_UNIT_TESTS)
       CXX_STANDARD 20
   )
   target_link_libraries(c9y-test PRIVATE c9y GTest::gtest)
-  add_test(NAME c9y-test 
+  add_test(NAME c9y-test
            COMMAND c9y-test
   )
 endif()
 
 # install
-install(TARGETS c9y 
+install(TARGETS c9y
         EXPORT c9yTargets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
@@ -103,8 +102,8 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/c9yConfig.cmake"
         DESTINATION lib/cmake/c9y
 )
 
-export(TARGETS c9y 
-       NAMESPACE c9y:: 
+export(TARGETS c9y
+       NAMESPACE c9y::
        FILE c9yTargets.cmake
 )
 

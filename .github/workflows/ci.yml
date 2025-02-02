@@ -1,14 +1,14 @@
 name: CI
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
 permissions:
   contents: read
   packages: write
+  pull-requests: write
+
 
 env:
   VCPKG_COMMIT: 0ca64b4e1c70fa6d9f53b369b8f3f0843797c20c
@@ -22,7 +22,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - name: Check CMake 
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       with:
         script: |
           let path = require('path');
@@ -63,7 +63,7 @@ jobs:
           core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
           core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
     - name: Install vcpkg
-      uses: lukka/run-vcpkg@v10
+      uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
         appendedCacheKey: ${{ matrix.triplet }}
@@ -105,7 +105,7 @@ jobs:
           core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
           core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
     - name: Install vcpkg
-      uses: lukka/run-vcpkg@v10
+      uses: lukka/run-vcpkg@v11
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
         appendedCacheKey: ${{ matrix.triplet }}
@@ -115,3 +115,66 @@ jobs:
         configurePreset: 'ninja-test'
         buildPreset: 'ninja-test'
         testPreset: 'ninja-test'
+  review:
+    runs-on: ubuntu-latest
+    name: GPT-4 Code Review
+    needs: [msbuild, cmake]
+    steps:
+      - name: 'Set PR Fetch Depth'
+        run: echo "PR_FETCH_DEPTH=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ env.PR_FETCH_DEPTH }}
+      - name: Custom Code Review and Comment
+        uses: actions/github-script@v7
+        env:
+          CUSTOM_PROMPT: 'You are running in a github pull request and given a diff to review.\n1. Summerize the changes.\n2. If you find any code smells and flaws, please point them out with relevant code snipets. If the code is ok, a simple nothing to report is finde.\n3. Sugest a git commit comment based on the summery of the changes.\n\nHere is the diff:\n\n'
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        with:
+          script: |
+            (async () => {
+              const { execSync } = require('child_process');
+              const customPrompt = process.env.CUSTOM_PROMPT;
+              
+              // Fetch diff based on the file pattern
+              const diff = execSync(`git diff ${{ github.event.pull_request.base.sha }}  HEAD`).toString();
+              
+              // Request GPT-4 review
+              const prompt     = `${customPrompt} ${diff}`;
+
+              const payload = {
+                model: 'gpt-4o-mini',
+                messages: [
+                  {
+                    role: 'user',
+                    content: prompt
+                  }
+                ]
+              };
+              try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                  const responseData = await response.json();
+                  await github.rest.pulls.createReview({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: context.issue.number,
+                    review_id: 1,
+                    event: 'COMMENT',
+                    body: responseData.choices[0].message.content
+                  })                                
+                } else {
+                  console.error('Failed to get review:', await response.text());
+                }
+              } catch (error) {
+                console.error('An error occurred:', error);
+              }
+            })();

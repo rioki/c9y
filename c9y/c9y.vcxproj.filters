@@ -54,7 +54,7 @@
     <ClInclude Include="jthread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resetting_latch.h">
+    <ClInclude Include="barrier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -81,9 +81,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="jthread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="resetting_latch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

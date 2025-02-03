@@ -27,7 +27,7 @@
 
 TEST(defer, empty_catch_up)
 {
-    c9y::catch_up();
+    EXPECT_FALSE(c9y::catch_up());
 }
 
 TEST(defer, shedule_one_task)
@@ -38,10 +38,10 @@ TEST(defer, shedule_one_task)
     });
     EXPECT_EQ(count, 0u);
 
-    c9y::catch_up();
+    EXPECT_TRUE(c9y::catch_up());
     EXPECT_EQ(count, 1u);
 
-    c9y::catch_up();
+    EXPECT_FALSE(c9y::catch_up());
     EXPECT_EQ(count, 1u);
 }
 

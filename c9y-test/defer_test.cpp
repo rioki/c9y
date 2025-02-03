@@ -66,4 +66,9 @@ TEST(defer, shedule_multiple_tasks)
     EXPECT_EQ(count, 3u);
 }
 
+TEST(defer, null_defer_throws)
+{
+    EXPECT_THROW(c9y::defer({}), std::invalid_argument);
+}
+
 

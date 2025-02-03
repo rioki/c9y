@@ -23,6 +23,7 @@
 
 #include <cassert>
 #include <queue>
+#include <stdexcept>
 
 namespace c9y
 {
@@ -30,7 +31,10 @@ namespace c9y
 
     void defer(std::function<void()> fun)
     {
-        assert(fun);
+        if (!fun)
+        {
+            throw std::invalid_argument("defer: fun cannot be null");
+        }
         scheduler.push(std::move(fun));
     }
 

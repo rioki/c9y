@@ -108,7 +108,7 @@ jobs:
       with:
         vcpkgGitCommitId: ${{ env.VCPKG_COMMIT }}
     - name: Build
-      uses: lukka/run-cmake@v11
+      uses: lukka/run-cmake@v10
       with:
         configurePreset: 'ninja-test'
         buildPreset: 'ninja-test'

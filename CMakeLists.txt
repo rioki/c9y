@@ -12,6 +12,7 @@ set(HEADERS
   c9y/barrier.h
   c9y/c9y.h
   c9y/coroutine.h
+  c9y/defer.h
   c9y/defines.h
   c9y/exceptions.h
   c9y/jthread.h
@@ -27,6 +28,7 @@ set(HEADERS
 # library
 add_library(c9y
   c9y/async.cpp
+  c9y/defer.cpp
   c9y/exceptions.cpp
   c9y/jthread.cpp
   c9y/latch.cpp
@@ -53,6 +55,7 @@ if(ENABLE_UNIT_TESTS)
     c9y-test/async_test.cpp
     c9y-test/barrier_test.cpp
     c9y-test/coroutine_test.cpp
+    c9y-test/defer_test.cpp
     c9y-test/exception_test.cpp
     c9y-test/jthread_test.cpp
     c9y-test/latch_test.cpp

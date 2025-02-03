@@ -162,6 +162,7 @@
     <ClInclude Include="async.h" />
     <ClInclude Include="c9y.h" />
     <ClInclude Include="coroutine.h" />
+    <ClInclude Include="defer.h" />
     <ClInclude Include="defines.h" />
     <ClInclude Include="exceptions.h" />
     <ClInclude Include="jthread.h" />
@@ -176,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="async.cpp" />
+    <ClCompile Include="defer.cpp" />
     <ClCompile Include="exceptions.cpp" />
     <ClCompile Include="jthread.cpp" />
     <ClCompile Include="latch.cpp" />

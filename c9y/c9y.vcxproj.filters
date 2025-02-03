@@ -57,6 +57,9 @@
     <ClInclude Include="barrier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="defer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="thread_pool.cpp">
@@ -81,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="jthread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="defer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

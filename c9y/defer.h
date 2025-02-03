@@ -36,7 +36,7 @@ namespace c9y
     C9Y_EXPORT
     void defer(std::function<void()> fun);
 
-    //! Exectue any pending work added by defer.
+    //! Execute any pending work added by defer.
     //!
     //! @returns true if any work was executed.
     C9Y_EXPORT

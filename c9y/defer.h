@@ -29,7 +29,7 @@ namespace c9y
 {
     //! Schedule some work to be exectued on this thread later in catch_up.
     //!
-    //! This function runs lockless and thus is quite effient and does not
+    //! This function runs lockless and thus is quite efficient and does not
     //! mess with other threads.
     //!
     //! @param fun the function the schedule

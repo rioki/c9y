@@ -51,5 +51,8 @@
     <ClCompile Include="barrier_test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="defer_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

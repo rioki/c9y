@@ -22,6 +22,7 @@
 #include "jthread.h"
 
 #ifndef C9Y_USE_STD_JTHREAD
+#include <algorithm>
 #include <cassert>
 #include <atomic>
 #include <mutex>
